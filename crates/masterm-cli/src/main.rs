@@ -95,6 +95,12 @@ enum Commands {
         #[command(subcommand)]
         action: commands::sync::SyncAction,
     },
+
+    /// Interactive setup wizard
+    Setup(commands::setup::SetupArgs),
+
+    /// Show welcome screen
+    Welcome(commands::welcome::WelcomeArgs),
 }
 
 #[tokio::main]
@@ -131,5 +137,7 @@ async fn main() -> anyhow::Result<()> {
         Commands::Dashboard(args) => commands::dashboard::run(args).await,
         Commands::Completions(args) => commands::completions::run(args),
         Commands::Sync { action } => commands::sync::run(action).await,
+        Commands::Setup(args) => commands::setup::run(args).await,
+        Commands::Welcome(args) => commands::welcome::run(args).await,
     }
 }

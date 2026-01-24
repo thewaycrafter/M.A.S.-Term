@@ -77,6 +77,9 @@ zle -N zle-line-init __masterm_zle-line-init
 
 # Initial prompt
 PROMPT="$(masterm prompt --shell zsh --exit-code 0 --duration 0)"
+
+# Show welcome screen
+masterm welcome
 "#.to_string()
 }
 
@@ -110,6 +113,9 @@ PROMPT_COMMAND="__masterm_prompt"
 
 # Initial prompt
 PS1="$(masterm prompt --shell bash --exit-code 0 --duration 0)"
+
+# Show welcome screen
+masterm welcome
 "#.to_string()
 }
 
@@ -132,5 +138,8 @@ end
 
 # Transient prompt support (requires 'transient' plugin or similar, setting up foundation)
 function fish_mode_prompt; end
+
+# Show welcome screen
+masterm welcome
 "#.to_string()
 }

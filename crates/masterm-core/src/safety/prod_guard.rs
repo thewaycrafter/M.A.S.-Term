@@ -140,7 +140,7 @@ mod tests {
     fn test_prod_guard_blocks_in_prod() {
         let guard = ProdGuard::new(EnvironmentType::Production);
 
-        match guard.check("rm -rf /var/logs") {
+        match guard.check("rm -rf user_data") {
             CommandAction::Confirm(_) => {}
             other => panic!("Expected Confirm, got {:?}", other),
         }

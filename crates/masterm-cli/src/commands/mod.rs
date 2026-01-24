@@ -12,6 +12,8 @@ pub mod plugins;
 pub mod profile;
 pub mod prompt;
 pub mod sync;
+pub mod setup;
+pub mod welcome;
 pub mod update;
 
 

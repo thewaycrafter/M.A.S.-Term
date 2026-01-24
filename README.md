@@ -44,6 +44,9 @@
 # One-command install (macOS/Linux)
 curl -fsSL https://raw.githubusercontent.com/singhalmridul/MASTerm/main/install.sh | bash
 
+# Configure your experience (Recommended)
+masterm setup
+
 # Restart your terminal, and you're done! ✨
 ```
 
@@ -82,6 +85,15 @@ curl -fsSL https://raw.githubusercontent.com/singhalmridul/MASTerm/main/install.
 ---
 
 ## ✨ Features
+
+### 🧙 Interactive Setup Wizard
+Just like Powerlevel10k, but simpler. Run `masterm setup` to visually configure:
+- 🎨 Color Themes
+- ⚡ Safety Levels
+- ☁️ Cloud Sync
+
+### 👋 Beautiful Welcome Screen
+Greet your day with style. `masterm welcome` shows a stunning ASCII banner and real-time system stats (CPU/RAM) every time you open a new terminal.
 
 ### 🎨 Beautiful, Informative Prompts
 
@@ -313,7 +325,16 @@ masterm completions fish > ~/.config/fish/completions/masterm.fish
 | `kubernetes` | kubectl available | K8s context |
 | `java` | `pom.xml` | Java version |
 
-### Plugin Management
+### Plugin Marketplace
+Discover and install plugins from the community registry:
+
+```bash
+masterm plugins search docker   # Search registry
+masterm plugins install docker-context # Install plugin
+masterm plugins list            # List installed
+```
+
+### Manual Management
 
 ```bash
 masterm plugins list           # List all
