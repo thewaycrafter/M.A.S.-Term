@@ -4,7 +4,7 @@ members = [
     "crates/masterm-core",
     "crates/masterm-cli",
     "crates/masterm-shell",
-    "crates/masterm-plugins",
+    "crates/masterm-plugins", "crates/masterm-tui",
 ]
 
 [workspace.package]
@@ -37,6 +37,9 @@ tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 
 # Terminal
+comfy-table = "7.1"
+ratatui = "0.26"
+owo-colors = "4.0"
 crossterm = "0.27"
 console = "0.15"
 indicatif = "0.17"

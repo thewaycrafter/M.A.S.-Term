@@ -25,18 +25,9 @@ pub async fn run(action: CacheAction) -> Result<()> {
 
 /// Clear cache
 async fn clear_cache() -> Result<()> {
-    let cache_dir = dirs::home_dir()
-        .map(|h| h.join(".masterm/cache"))
-        .ok_or_else(|| anyhow::anyhow!("Cannot find home directory"))?;
-
-    if cache_dir.exists() {
-        std::fs::remove_dir_all(&cache_dir)?;
-        std::fs::create_dir_all(&cache_dir)?;
-        output::success("Cache cleared");
-    } else {
-        output::info("Cache directory doesn't exist");
-    }
-
+    masterm_core::cache::CacheManager::init()?;
+    masterm_core::cache::CacheManager::clear()?;
+    output::success("Cache cleared");
     Ok(())
 }
 
@@ -44,38 +35,20 @@ async fn clear_cache() -> Result<()> {
 async fn show_stats() -> Result<()> {
     println!("{}", style("MASTerm Cache Statistics").bold());
     println!("{}", "═".repeat(60));
-    println!();
 
-    let cache_dir = dirs::home_dir()
-        .map(|h| h.join(".masterm/cache"))
-        .ok_or_else(|| anyhow::anyhow!("Cannot find home directory"))?;
+    masterm_core::cache::CacheManager::init()?;
+    let (count, _size) = masterm_core::cache::CacheManager::stats()?;
 
-    if !cache_dir.exists() {
-        output::info("Cache directory doesn't exist");
-        return Ok(());
-    }
+    let cache_path = dirs::home_dir()
+        .map(|h| h.join(".masterm/cache.db"))
+        .unwrap_or_else(|| std::path::PathBuf::from(".masterm_cache.db"));
 
-    // Count files and size
-    let mut file_count = 0;
-    let mut total_size: u64 = 0;
-
-    for entry in walkdir::WalkDir::new(&cache_dir)
-        .into_iter()
-        .filter_map(|e| e.ok())
-    {
-        if entry.file_type().is_file() {
-            file_count += 1;
-            total_size += entry.metadata().map(|m| m.len()).unwrap_or(0);
-        }
-    }
-
-    println!("{:<25} {:>20}", "Cache directory:", cache_dir.display());
-    println!("{:<25} {:>20}", "Cached entries:", file_count);
-    println!("{:<25} {:>20}", "Total size:", format_bytes(total_size));
-
-    // Note: In a full implementation, we'd track hit rates
-    println!("\n{}", style("Note:").dim());
-    println!("{}", style("Cache hit tracking coming in v1.2").dim());
+    println!("{:<25} {:>20}", "Cache path:", cache_path.display());
+    println!("{:<25} {:>20}", "Cached entries:", count);
+    
+    // Check actual file size
+    let file_size = std::fs::metadata(&cache_path).map(|m| m.len()).unwrap_or(0);
+    println!("{:<25} {:>20}", "Database size:", format_bytes(file_size));
 
     Ok(())
 }

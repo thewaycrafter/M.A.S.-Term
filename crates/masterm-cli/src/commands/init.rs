@@ -13,6 +13,12 @@ pub struct InitArgs {
 
 /// Run the init command
 pub async fn run(args: InitArgs) -> Result<()> {
+    // Initialize cache
+    if let Err(e) = masterm_core::cache::CacheManager::init() {
+        // Log error but continue - don't crash shell init
+        eprintln!("Failed to initialize cache: {}", e);
+    }
+    
     let shell = ShellType::from_path(&args.shell);
 
     let script = match shell {
@@ -40,7 +46,7 @@ __masterm_preexec() {
     __masterm_cmd_start=$EPOCHREALTIME
 }
 
-# Generate prompt after command
+# Generate prompt after command ensures prompt is fresh
 __masterm_precmd() {
     local exit_code=$?
     local duration=0
@@ -51,15 +57,23 @@ __masterm_precmd() {
         unset __masterm_cmd_start
     fi
 
-    # Generate prompt
+    # Generate full prompt
     PROMPT="$(masterm prompt --shell zsh --exit-code $exit_code --duration $duration)"
+    
+    # Right prompt logic (placeholder for future expansion)
     RPROMPT=""
+}
+
+# Transient prompt: Redraw prompt as a compact version before executing next command
+__masterm_zle-line-init() {
+    zle reset-prompt
 }
 
 # Hook into zsh
 autoload -Uz add-zsh-hook
 add-zsh-hook preexec __masterm_preexec
 add-zsh-hook precmd __masterm_precmd
+zle -N zle-line-init __masterm_zle-line-init
 
 # Initial prompt
 PROMPT="$(masterm prompt --shell zsh --exit-code 0 --duration 0)"
@@ -113,7 +127,10 @@ function fish_prompt
 end
 
 function fish_right_prompt
-    # Empty right prompt - MASTerm handles this
+    # Empty right prompt - MASTerm handles this via masterm prompt if needed
 end
+
+# Transient prompt support (requires 'transient' plugin or similar, setting up foundation)
+function fish_mode_prompt; end
 "#.to_string()
 }

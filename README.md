@@ -97,6 +97,19 @@ Your prompt shows everything at a glance:
 - ⏱️ Command duration
 - ⚠️ Production warnings
 
+### 🖥️ Feature-Rich TUI Dashboard
+Running `masterm dashboard` opens a powerful terminal interface:
+- **System Monitor**: Real-time CPU & Memory usage graphs.
+- **Config Editor**: View and inspect your configuration.
+- **Plugin Manager**: Manage built-in and WASM plugins.
+
+### ☁️ Cloud Sync
+Sync your configuration across machines using GitHub Gists:
+```bash
+masterm sync push    # Backup config
+masterm sync pull    # Restore config
+```
+
 ### 🔍 Zero-Config Intelligence
 
 MASTerm automatically detects and displays context:
@@ -322,6 +335,10 @@ disabled = ["java"]
 show_stash = true
 show_ahead_behind = true
 truncate_branch = 30
+
+[plugins.ext]
+# MASTerm supports loading external WASM plugins from ~/.masterm/plugins
+wasm_enabled = true
 ```
 
 ---

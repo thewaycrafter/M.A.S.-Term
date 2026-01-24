@@ -1,160 +1,69 @@
-//! Caching layer for expensive computations
+//! Cache subsystem
+
+pub mod db;
 
 use anyhow::Result;
+use db::CacheDb;
+use once_cell::sync::Lazy;
 use std::path::PathBuf;
-use std::time::{Duration, Instant};
-use std::collections::HashMap;
+use std::sync::Mutex;
 
-/// Cache store for MASTerm
-pub struct CacheStore {
-    /// In-memory cache
-    memory: HashMap<String, CacheEntry>,
+static CACHE_INSTANCE: Lazy<Mutex<Option<CacheManager>>> = Lazy::new(|| Mutex::new(None));
 
-    /// Cache directory
-    cache_dir: PathBuf,
-
-    /// Default TTL
-    default_ttl: Duration,
-
-    /// Max memory entries
-    max_entries: usize,
+pub struct CacheManager {
+    pub db: CacheDb,
 }
 
-/// A cached entry
-struct CacheEntry {
-    /// Cached value
-    value: String,
-
-    /// When entry was created
-    created_at: Instant,
-
-    /// Time to live
-    ttl: Duration,
-}
-
-impl CacheEntry {
-    fn is_expired(&self) -> bool {
-        self.created_at.elapsed() > self.ttl
-    }
-}
-
-impl CacheStore {
-    /// Create a new cache store
-    pub fn new() -> Self {
-        let cache_dir = dirs::cache_dir()
-            .unwrap_or_else(|| PathBuf::from("/tmp"))
-            .join("masterm");
-
-        Self {
-            memory: HashMap::new(),
-            cache_dir,
-            default_ttl: Duration::from_secs(300),
-            max_entries: 1000,
-        }
+impl CacheManager {
+    pub fn init() -> Result<()> {
+        let cache_dir = dirs::home_dir()
+            .map(|h| h.join(".masterm/cache.db"))
+            .unwrap_or_else(|| PathBuf::from(".masterm_cache.db"));
+            
+        let db = CacheDb::new(cache_dir)?;
+        let manager = Self { db };
+        
+        let mut instance = CACHE_INSTANCE.lock().unwrap();
+        *instance = Some(manager);
+        
+        Ok(())
     }
 
-    /// Create with custom cache directory
-    pub fn with_dir(mut self, dir: PathBuf) -> Self {
-        self.cache_dir = dir;
-        self
+    pub fn get_instance() -> Option<std::sync::MutexGuard<'static, Option<CacheManager>>> {
+        CACHE_INSTANCE.lock().ok()
     }
 
-    /// Create with custom TTL
-    pub fn with_ttl(mut self, ttl: Duration) -> Self {
-        self.default_ttl = ttl;
-        self
-    }
-
-    /// Get a cached value
-    pub fn get(&self, key: &str) -> Option<&str> {
-        self.memory.get(key).and_then(|entry| {
-            if entry.is_expired() {
-                None
-            } else {
-                Some(entry.value.as_str())
+    pub fn get(key: &str) -> Option<String> {
+        let guard = CACHE_INSTANCE.lock().unwrap();
+        if let Some(manager) = guard.as_ref() {
+            match manager.db.get(key) {
+                Ok(Some(entry)) => return Some(entry.value),
+                _ => return None,
             }
-        })
-    }
-
-    /// Set a cached value with default TTL
-    pub fn set(&mut self, key: impl Into<String>, value: impl Into<String>) {
-        self.set_with_ttl(key, value, self.default_ttl);
-    }
-
-    /// Set a cached value with custom TTL
-    pub fn set_with_ttl(&mut self, key: impl Into<String>, value: impl Into<String>, ttl: Duration) {
-        // Evict old entries if needed
-        if self.memory.len() >= self.max_entries {
-            self.evict_expired();
         }
-
-        self.memory.insert(
-            key.into(),
-            CacheEntry {
-                value: value.into(),
-                created_at: Instant::now(),
-                ttl,
-            },
-        );
+        None
     }
 
-    /// Remove a cached value
-    pub fn remove(&mut self, key: &str) {
-        self.memory.remove(key);
-    }
-
-    /// Clear all cached values
-    pub fn clear(&mut self) {
-        self.memory.clear();
-    }
-
-    /// Evict expired entries
-    pub fn evict_expired(&mut self) {
-        self.memory.retain(|_, entry| !entry.is_expired());
-    }
-
-    /// Get cache statistics
-    pub fn stats(&self) -> CacheStats {
-        let total = self.memory.len();
-        let expired = self.memory.values().filter(|e| e.is_expired()).count();
-
-        CacheStats {
-            total_entries: total,
-            expired_entries: expired,
-            active_entries: total - expired,
+    pub fn set(key: &str, value: &str, ttl_secs: u64) {
+        let guard = CACHE_INSTANCE.lock().unwrap();
+        if let Some(manager) = guard.as_ref() {
+            let _ = manager.db.set(key, value, None, ttl_secs);
         }
     }
-
-    /// Get or compute a value
-    pub fn get_or_compute<F>(&mut self, key: &str, compute: F) -> Result<String>
-    where
-        F: FnOnce() -> Result<String>,
-    {
-        if let Some(value) = self.get(key) {
-            return Ok(value.to_string());
+    
+    pub fn clear() -> Result<()> {
+        let guard = CACHE_INSTANCE.lock().unwrap();
+        if let Some(manager) = guard.as_ref() {
+            manager.db.clear()?;
         }
-
-        let value = compute()?;
-        self.set(key.to_string(), value.clone());
-        Ok(value)
+        Ok(())
     }
-}
-
-impl Default for CacheStore {
-    fn default() -> Self {
-        Self::new()
+    
+    pub fn stats() -> Result<(usize, usize)> {
+        let guard = CACHE_INSTANCE.lock().unwrap();
+        if let Some(manager) = guard.as_ref() {
+            return manager.db.stats();
+        }
+        Ok((0, 0))
     }
-}
-
-/// Cache statistics
-#[derive(Debug, Clone)]
-pub struct CacheStats {
-    /// Total number of entries
-    pub total_entries: usize,
-
-    /// Number of expired entries
-    pub expired_entries: usize,
-
-    /// Number of active (non-expired) entries
-    pub active_entries: usize,
 }

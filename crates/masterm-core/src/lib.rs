@@ -5,6 +5,7 @@
 //! plugin management, and safety features.
 
 pub mod cache;
+pub mod cloud;
 pub mod config;
 pub mod context;
 pub mod plugin;

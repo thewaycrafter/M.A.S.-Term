@@ -5,6 +5,7 @@ use anyhow::Result;
 use clap::Subcommand;
 use console::style;
 use masterm_core::plugin::PluginLoader;
+use comfy_table::{Table, presets::UTF8_HORIZONTAL_ONLY, ContentArrangement, Cell, Color};
 
 /// Plugins subcommands
 #[derive(Subcommand)]
@@ -80,16 +81,7 @@ async fn list_plugins(show_status: bool) -> Result<()> {
     let loader = PluginLoader::new();
     let manifests = loader.discover();
 
-    if manifests.is_empty() {
-        println!("\nNo plugins installed.");
-        println!("Use 'masterm plugins install <name>' to add plugins.");
-        return Ok(());
-    }
-
-    // Also show built-in plugins
-    println!("\n{}", style("Built-in Plugins").bold());
-    println!("{}", "─".repeat(50));
-
+    // Built-in plugins data
     let builtin = vec![
         ("git", "Git repository context", "1.0.0", true),
         ("env", "Environment detection", "1.0.0", true),
@@ -100,52 +92,46 @@ async fn list_plugins(show_status: bool) -> Result<()> {
         ("rust", "Rust detection", "1.0.0", true),
     ];
 
+    let mut table = Table::new();
+    table
+        .load_preset(UTF8_HORIZONTAL_ONLY)
+        .set_content_arrangement(ContentArrangement::Dynamic)
+        .set_header(vec!["Name", "Version", "Status", "Description"]);
+
+    // Add built-in plugins
     for (name, desc, version, enabled) in builtin {
-        let status = if enabled {
-            style("enabled").green()
+        let status_cell = if enabled {
+            Cell::new("Active").fg(Color::Green)
         } else {
-            style("disabled").dim()
+            Cell::new("Disabled").fg(Color::DarkGrey)
         };
 
-        if show_status {
-            println!(
-                "  {} {} {} - {}",
-                output::SUCCESS,
-                style(name).cyan().bold(),
-                style(format!("v{}", version)).dim(),
-                desc
-            );
-            println!("    Status: {}", status);
-        } else {
-            println!(
-                "  {} {} {} [{}]",
-                output::SUCCESS,
-                style(name).cyan(),
-                style(format!("v{}", version)).dim(),
-                status
-            );
-        }
+        table.add_row(vec![
+            Cell::new(name).fg(Color::Cyan).add_attribute(comfy_table::Attribute::Bold),
+            Cell::new(format!("v{}", version)),
+            status_cell,
+            Cell::new(desc),
+        ]);
     }
 
-    if !manifests.is_empty() {
-        println!("\n{}", style("External Plugins").bold());
-        println!("{}", "─".repeat(50));
+    // Add external plugins
+    for manifest in manifests {
+        let status_cell = Cell::new("Active").fg(Color::Green); // External plugins found are active by default for now
 
-        for manifest in manifests {
-            println!(
-                "  {} {} v{}",
-                output::SUCCESS,
-                style(&manifest.plugin.name).cyan(),
-                manifest.plugin.version
-            );
-
-            if show_status {
-                println!("    {}", manifest.plugin.description);
-            }
-        }
+        table.add_row(vec![
+            Cell::new(&manifest.plugin.name).fg(Color::Cyan).add_attribute(comfy_table::Attribute::Bold),
+            Cell::new(format!("v{}", manifest.plugin.version)),
+            status_cell,
+            Cell::new(&manifest.plugin.description),
+        ]);
     }
 
-    println!();
+    println!("{table}");
+
+    if !show_status {
+        println!("\n{}", style("Tip: Use --status for more details (coming soon in v1.2)").dim());
+    }
+
     Ok(())
 }
 

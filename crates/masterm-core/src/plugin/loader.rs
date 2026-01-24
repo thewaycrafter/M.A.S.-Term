@@ -54,11 +54,24 @@ impl PluginLoader {
 
             if let Ok(entries) = std::fs::read_dir(dir) {
                 for entry in entries.filter_map(|e| e.ok()) {
-                    let manifest_path = entry.path().join("plugin.toml");
-                    if manifest_path.exists() {
-                        if let Ok(manifest) = self.load_manifest(&manifest_path) {
-                            if !self.disabled.contains(&manifest.plugin.name) {
-                                manifests.push(manifest);
+                    let path = entry.path();
+                    
+                    // Case 1: Directory with plugin.toml
+                    if path.is_dir() {
+                        let manifest_path = path.join("plugin.toml");
+                        if manifest_path.exists() {
+                            if let Ok(manifest) = self.load_manifest(&manifest_path) {
+                                if !self.disabled.contains(&manifest.plugin.name) {
+                                    manifests.push(manifest);
+                                }
+                            }
+                        }
+                    }
+                    // Case 2: Standalone .wasm file
+                    else if path.extension().is_some_and(|ext| ext == "wasm") {
+                        if let Some(name) = path.file_stem().and_then(|s| s.to_str()) {
+                            if !self.disabled.contains(&name.to_string()) {
+                                manifests.push(self.synthetic_manifest(name));
                             }
                         }
                     }
@@ -74,6 +87,26 @@ impl PluginLoader {
         let content = std::fs::read_to_string(path)?;
         let manifest: PluginManifest = toml::from_str(&content)?;
         Ok(manifest)
+    }
+
+    /// Create a synthetic manifest for a standalone WASM file
+    fn synthetic_manifest(&self, name: &str) -> PluginManifest {
+        use super::{PluginMeta, PluginRequirements, PluginPermissions, PluginActivation, PluginPerformance};
+        
+        PluginManifest {
+            plugin: PluginMeta {
+                name: name.to_string(),
+                version: "0.1.0".to_string(),
+                description: "Standalone WASM plugin".to_string(),
+                author: "Unknown".to_string(),
+                license: "None".to_string(),
+                homepage: None,
+            },
+            requirements: PluginRequirements::default(),
+            permissions: PluginPermissions::default(),
+            activation: PluginActivation::default(),
+            performance: PluginPerformance::default(),
+        }
     }
 }
 

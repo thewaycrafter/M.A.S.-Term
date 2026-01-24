@@ -6,6 +6,7 @@ use clap::Args;
 use console::style;
 use std::process::Command;
 use masterm_core::config::{ConfigLoader, ShellType, ColorCapability};
+use comfy_table::{Table, presets::UTF8_FULL, ContentArrangement, Cell, Color};
 
 /// Doctor command arguments
 #[derive(Args)]
@@ -25,29 +26,25 @@ pub async fn run(_args: DoctorArgs) -> Result<()> {
 
     // System Information
     println!("\n{}", style("System Information").bold());
-    println!("{}", "─".repeat(40));
+    
+    let mut sys_table = Table::new();
+    sys_table
+        .load_preset(UTF8_FULL)
+        .set_content_arrangement(ContentArrangement::Dynamic)
+        .set_header(vec!["Component", "Value"]);
 
     // OS
     let os = std::env::consts::OS;
     let arch = std::env::consts::ARCH;
-    output::item("OS", &format!("{} ({})", os, arch));
+    sys_table.add_row(vec!["OS", &format!("{} ({})", os, arch)]);
 
     // Shell
     let shell = ShellType::detect();
-    output::item("Shell", shell.name());
+    sys_table.add_row(vec!["Shell", shell.name()]);
 
     // Terminal
     let term_program = std::env::var("TERM_PROGRAM").unwrap_or_else(|_| "Unknown".to_string());
-    output::item("Terminal", &term_program);
-
-    // Font support
-    let has_nerd_font = detect_nerd_fonts();
-    if has_nerd_font {
-        println!("  {}: {} Nerd Fonts detected", style("Fonts").dim(), output::SUCCESS);
-    } else {
-        println!("  {}: {} Nerd Fonts not detected (using fallback)", style("Fonts").dim(), output::WARNING);
-        warnings += 1;
-    }
+    sys_table.add_row(vec!["Terminal", &term_program]);
 
     // Color support
     let color_cap = ColorCapability::detect();
@@ -57,7 +54,26 @@ pub async fn run(_args: DoctorArgs) -> Result<()> {
         ColorCapability::Basic => "16 colors",
         ColorCapability::None => "No color support",
     };
-    output::item("Colors", color_str);
+    sys_table.add_row(vec!["Colors", color_str]);
+
+    // Font support
+    let has_nerd_font = detect_nerd_fonts();
+
+    // Note: table doesn't support owo_colors directly in str, using Cell styling
+    sys_table.add_row(vec![
+        Cell::new("Fonts"), 
+        if has_nerd_font { 
+            Cell::new("Nerd Fonts detected").fg(Color::Green) 
+        } else { 
+            Cell::new("Nerd Fonts not detected (Fallback)").fg(Color::Yellow) 
+        }
+    ]);
+
+    println!("{sys_table}");
+    
+    if !has_nerd_font {
+        warnings += 1;
+    }
 
     // Installation
     println!("\n{}", style("Installation").bold());

@@ -3,6 +3,7 @@
 pub mod cache;
 pub mod completions;
 pub mod config;
+pub mod dashboard;
 pub mod doctor;
 pub mod init;
 pub mod install;
@@ -10,6 +11,7 @@ pub mod mode;
 pub mod plugins;
 pub mod profile;
 pub mod prompt;
+pub mod sync;
 pub mod update;
 
 
@@ -54,8 +56,5 @@ pub mod output {
         println!("{}", "═".repeat(60));
     }
 
-    /// Print a labeled item
-    pub fn item(label: &str, value: &str) {
-        println!("  {}: {}", style(label).dim(), value);
-    }
+
 }

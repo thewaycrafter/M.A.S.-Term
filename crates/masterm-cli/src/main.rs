@@ -78,14 +78,23 @@ enum Commands {
         action: commands::profile::ProfileAction,
     },
 
-    /// Cache management
+    /// Clear cache
     Cache {
         #[command(subcommand)]
         action: commands::cache::CacheAction,
     },
 
+    /// Launch TUI dashboard
+    Dashboard(commands::dashboard::DashboardArgs),
+
     /// Generate shell completions
     Completions(commands::completions::CompletionsArgs),
+
+    /// Cloud synchronization
+    Sync {
+        #[command(subcommand)]
+        action: commands::sync::SyncAction,
+    },
 }
 
 #[tokio::main]
@@ -119,6 +128,8 @@ async fn main() -> anyhow::Result<()> {
         Commands::Mode(args) => commands::mode::run(args).await,
         Commands::Profile { action } => commands::profile::run(action).await,
         Commands::Cache { action } => commands::cache::run(action).await,
+        Commands::Dashboard(args) => commands::dashboard::run(args).await,
         Commands::Completions(args) => commands::completions::run(args),
+        Commands::Sync { action } => commands::sync::run(action).await,
     }
 }

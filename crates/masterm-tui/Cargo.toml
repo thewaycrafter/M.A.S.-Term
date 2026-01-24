@@ -1,0 +1,17 @@
+[package]
+name = "masterm-tui"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "TUI dashboard for MASTerm"
+
+[dependencies]
+masterm-core = { path = "../masterm-core" }
+ratatui = { workspace = true }
+crossterm = { workspace = true }
+anyhow = { workspace = true }
+tokio = { workspace = true }
+tracing = { workspace = true }
+sysinfo = "0.30"
+dirs = { workspace = true }

@@ -3,9 +3,11 @@
 use anyhow::Result;
 use std::path::Path;
 use std::process::Command;
+use std::time::UNIX_EPOCH;
+use serde::{Serialize, Deserialize};
 
 /// Git repository context
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct GitContext {
     /// Current branch name
     pub branch: String,
@@ -52,6 +54,66 @@ impl GitContext {
             return Ok(None);
         }
 
+        let repo_root = Self::get_repo_root(cwd).unwrap_or_else(|| cwd.display().to_string());
+        
+        // Cache key
+        let cache_key = format!("git_status:{}", repo_root);
+
+        // Check cache
+        if let Some(guard) = crate::cache::CacheManager::get_instance() {
+            if let Some(manager) = guard.as_ref() {
+                if let Ok(Some(entry)) = manager.db.get(&cache_key) {
+                    if let Ok(context) = serde_json::from_str::<Self>(&entry.value) {
+                        if Self::is_cache_fresh(Path::new(&repo_root), entry.created_at) {
+                            return Ok(Some(context));
+                        }
+                    }
+                }
+            }
+        }
+
+        // Compute real context
+        let context = Self::compute_context(cwd, &repo_root)?;
+
+        // Cache result
+        if let Some(context) = &context {
+            if let Ok(json) = serde_json::to_string(context) {
+                if let Some(guard) = crate::cache::CacheManager::get_instance() {
+                    if let Some(manager) = guard.as_ref() {
+                        // Cache for 5 minutes (validation handles staleness)
+                        let _ = manager.db.set(&cache_key, &json, None, 300);
+                    }
+                }
+            }
+        }
+
+        Ok(context)
+    }
+
+    /// Check if cache is fresh by comparing timestamps with git files
+    fn is_cache_fresh(root: &Path, cache_ts: u64) -> bool {
+        let files = [".git/index", ".git/HEAD", ".git/refs/heads"];
+        
+        for file in files {
+            let p = root.join(file);
+            if let Ok(metadata) = std::fs::metadata(&p) {
+                if let Ok(modified) = metadata.modified() {
+                    let mod_ts = modified
+                        .duration_since(UNIX_EPOCH)
+                        .unwrap_or_default()
+                        .as_secs();
+                    
+                    if mod_ts > cache_ts {
+                        return false;
+                    }
+                }
+            }
+        }
+        true
+    }
+
+    /// Compute context (expensive operation)
+    fn compute_context(cwd: &Path, repo_root: &str) -> Result<Option<Self>> {
         // Get branch name
         let branch = Self::get_branch(cwd)?;
         let detached = branch.is_none();
@@ -65,9 +127,6 @@ impl GitContext {
 
         // Get stash count
         let stash_count = Self::get_stash_count(cwd).unwrap_or(0);
-
-        // Get repo root
-        let repo_root = Self::get_repo_root(cwd).unwrap_or_else(|| cwd.display().to_string());
 
         let is_clean = staged == 0 && modified == 0 && untracked == 0 && deleted == 0;
 
@@ -83,7 +142,7 @@ impl GitContext {
             stash_count,
             is_clean,
             conflict,
-            repo_root,
+            repo_root: repo_root.to_string(),
         }))
     }
 
