@@ -189,7 +189,7 @@ allowed = ["git", "env", "prod-guard"]
 | Zsh | ✅ Full support |
 | Bash | ✅ Full support |
 | Fish | ✅ Full support |
-| PowerShell | 🚧 Coming soon |
+| PowerShell | ✅ Full support |
 
 ## Contributing
 
