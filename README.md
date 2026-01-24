@@ -78,13 +78,24 @@ Type 'yes' to confirm:
 
 ### Quick Install (Recommended)
 
+One command to install everything:
+
 ```bash
-# Using curl
-curl -fsSL https://masterm.dev/install.sh | bash
+# Using curl (macOS/Linux)
+curl -fsSL https://raw.githubusercontent.com/singhalmridul/MASTerm/main/install.sh | bash
 
 # Using wget
-wget -qO- https://masterm.dev/install.sh | bash
+wget -qO- https://raw.githubusercontent.com/singhalmridul/MASTerm/main/install.sh | bash
+
+# Specify shell explicitly
+curl -fsSL https://raw.githubusercontent.com/singhalmridul/MASTerm/main/install.sh | bash -s -- --shell zsh
 ```
+
+This script will:
+1. ✅ Install Rust (if not present)
+2. ✅ Clone and build MASTerm
+3. ✅ Create configuration files
+4. ✅ Set up your shell automatically
 
 ### From Source
 
