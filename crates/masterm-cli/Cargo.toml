@@ -38,3 +38,5 @@ sha2.workspace = true
 chrono.workspace = true
 walkdir.workspace = true
 which.workspace = true
+regex.workspace = true
+once_cell.workspace = true

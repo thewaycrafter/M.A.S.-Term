@@ -9,6 +9,12 @@ use masterm_core::{
 };
 use std::path::PathBuf;
 use std::time::Duration;
+use regex::Regex;
+use once_cell::sync::Lazy;
+
+static ANSI_REGEX: Lazy<Regex> = Lazy::new(|| {
+    Regex::new(r"\x1b\[[0-9;]*m").expect("Invalid regex")
+});
 
 /// Prompt command arguments
 #[derive(Args)]
@@ -82,16 +88,44 @@ pub async fn run(args: PromptArgs) -> Result<()> {
 /// Escape ANSI codes for Zsh
 fn escape_zsh(s: &str) -> String {
     // Zsh uses %{ and %} to wrap non-printing characters
-    // This is a simplified version; a full implementation would parse ANSI codes
-    s.replace("\x1b[", "%{\x1b[")
-        .replace("m", "m%}")
-        .replace("%}%{", "")
+    ANSI_REGEX.replace_all(s, "%{$0%}").to_string()
 }
 
 /// Escape ANSI codes for Bash
 fn escape_bash(s: &str) -> String {
     // Bash uses \[ and \] to wrap non-printing characters
-    s.replace("\x1b[", "\\[\x1b[")
-        .replace("m", "m\\]")
-        .replace("\\]\\[", "")
+    ANSI_REGEX.replace_all(s, "\\[$0\\]").to_string()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_escape_zsh_no_ansi() {
+        let s = "/home/myuser/music";
+        let escaped = escape_zsh(s);
+        assert_eq!(escaped, s);
+    }
+
+    #[test]
+    fn test_escape_zsh_with_ansi() {
+        let s = "\x1b[31mmusic\x1b[0m";
+        let escaped = escape_zsh(s);
+        assert_eq!(escaped, "%{\x1b[31m%}music%{\x1b[0m%}");
+    }
+
+    #[test]
+    fn test_escape_bash_with_ansi() {
+        let s = "\x1b[31mmusic\x1b[0m";
+        let escaped = escape_bash(s);
+        assert_eq!(escaped, "\\[\x1b[31m\\]music\\[\x1b[0m\\]");
+    }
+
+    #[test]
+    fn test_escape_mixed_content() {
+        let s = "prefix \x1b[1mmiddle\x1b[0m suffix";
+        let escaped = escape_zsh(s);
+        assert_eq!(escaped, "prefix %{\x1b[1m%}middle%{\x1b[0m%} suffix");
+    }
 }
