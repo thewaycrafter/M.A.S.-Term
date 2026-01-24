@@ -184,12 +184,17 @@ impl LanguageContext {
             .unwrap_or_else(|| output.trim().to_string())
     }
 
-    /// Get package name from package.json
+    /// Get package name from package.json (simple parsing without serde_json)
     fn get_package_json_name(path: &Path) -> Option<String> {
         std::fs::read_to_string(path)
             .ok()
-            .and_then(|content| serde_json::from_str::<serde_json::Value>(&content).ok())
-            .and_then(|json| json["name"].as_str().map(|s| s.to_string()))
+            .and_then(|content| {
+                // Simple regex-based extraction of "name" field
+                let re = regex::Regex::new(r#""name"\s*:\s*"([^"]+)""#).ok()?;
+                re.captures(&content)
+                    .and_then(|caps| caps.get(1))
+                    .map(|m| m.as_str().to_string())
+            })
     }
 
     /// Get package name from Cargo.toml

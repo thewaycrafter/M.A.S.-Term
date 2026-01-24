@@ -6,7 +6,7 @@ use masterm_core::plugin::{
     PluginRequirements, PluginPermissions, PluginActivation, PluginPerformance,
     DetectionContext, CommandAction, ActivationTrigger,
 };
-use masterm_core::prompt::{Segment, SegmentStyle, Color, theme::NamedColor};
+use masterm_core::prompt::{Segment, SegmentStyle, Color, NamedColor};
 use std::process::Command;
 
 pub struct RustPlugin { manifest: PluginManifest }
@@ -43,7 +43,7 @@ impl Plugin for RustPlugin {
     async fn init(&mut self, _ctx: &PluginContext) -> Result<(), PluginError> { Ok(()) }
     fn should_activate(&self, ctx: &DetectionContext) -> bool { ctx.cwd.join("Cargo.toml").exists() }
 
-    async fn segments(&self, _ctx: &masterm_core::plugin::api::PromptContext) -> Result<Vec<Segment>, PluginError> {
+    async fn segments(&self, _ctx: &masterm_core::plugin::PromptContext) -> Result<Vec<Segment>, PluginError> {
         let version = Command::new("rustc").arg("--version").output().ok()
             .filter(|o| o.status.success())
             .and_then(|o| {

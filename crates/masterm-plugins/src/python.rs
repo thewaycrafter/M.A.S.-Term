@@ -6,7 +6,7 @@ use masterm_core::plugin::{
     PluginRequirements, PluginPermissions, PluginActivation, PluginPerformance,
     DetectionContext, CommandAction, ActivationTrigger,
 };
-use masterm_core::prompt::{Segment, SegmentStyle, Color, theme::NamedColor};
+use masterm_core::prompt::{Segment, SegmentStyle, Color, NamedColor};
 use std::process::Command;
 
 pub struct PythonPlugin {
@@ -78,7 +78,7 @@ impl Plugin for PythonPlugin {
         std::env::var("VIRTUAL_ENV").is_ok()
     }
 
-    async fn segments(&self, _ctx: &masterm_core::plugin::api::PromptContext) -> Result<Vec<Segment>, PluginError> {
+    async fn segments(&self, _ctx: &masterm_core::plugin::PromptContext) -> Result<Vec<Segment>, PluginError> {
         let mut segs = Vec::new();
 
         if let Some(venv) = self.get_venv() {

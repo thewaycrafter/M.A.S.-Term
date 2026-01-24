@@ -6,7 +6,7 @@ use masterm_core::plugin::{
     PluginRequirements, PluginPermissions, PluginActivation, PluginPerformance,
     DetectionContext, CommandAction, ActivationTrigger,
 };
-use masterm_core::prompt::{Segment, SegmentStyle, Position, Color, theme::NamedColor};
+use masterm_core::prompt::{Segment, SegmentStyle, Color, NamedColor};
 use std::process::Command;
 
 /// Git plugin for displaying repository information
@@ -137,7 +137,7 @@ impl Plugin for GitPlugin {
         ctx.cwd.join(".git").exists() || self.is_git_repo(&ctx.cwd)
     }
 
-    async fn segments(&self, ctx: &masterm_core::plugin::api::PromptContext) -> Result<Vec<Segment>, PluginError> {
+    async fn segments(&self, ctx: &masterm_core::plugin::PromptContext) -> Result<Vec<Segment>, PluginError> {
         let mut segments = Vec::new();
 
         if let Some(branch) = self.get_branch(&ctx.cwd) {

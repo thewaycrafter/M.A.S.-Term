@@ -7,7 +7,7 @@ use masterm_core::plugin::{
     PluginRequirements, PluginPermissions, PluginActivation, PluginPerformance,
     DetectionContext, CommandAction, ActivationTrigger,
 };
-use masterm_core::prompt::{Segment, SegmentStyle, Position, Color, theme::NamedColor};
+use masterm_core::prompt::{Segment, SegmentStyle, Color, NamedColor};
 
 /// Environment detection plugin
 pub struct EnvPlugin {
@@ -63,7 +63,7 @@ impl Plugin for EnvPlugin {
     async fn init(&mut self, _ctx: &PluginContext) -> Result<(), PluginError> { Ok(()) }
     fn should_activate(&self, _ctx: &DetectionContext) -> bool { true }
 
-    async fn segments(&self, ctx: &masterm_core::plugin::api::PromptContext) -> Result<Vec<Segment>, PluginError> {
+    async fn segments(&self, ctx: &masterm_core::plugin::PromptContext) -> Result<Vec<Segment>, PluginError> {
         let env_type = self.detect_env(&ctx.cwd);
 
         match env_type {

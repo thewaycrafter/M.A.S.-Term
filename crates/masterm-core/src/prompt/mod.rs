@@ -8,8 +8,8 @@
 
 mod renderer;
 mod segment;
-mod theme;
+pub mod theme;
 
 pub use renderer::{Prompt, PromptRenderer};
 pub use segment::{Segment, SegmentStyle, Position};
-pub use theme::{Theme, Color};
+pub use theme::{Theme, Color, NamedColor};

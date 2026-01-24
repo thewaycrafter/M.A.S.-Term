@@ -98,7 +98,7 @@ impl Plugin for ProdGuardPlugin {
         self.is_production(&ctx.cwd)
     }
 
-    async fn segments(&self, _ctx: &masterm_core::plugin::api::PromptContext) -> Result<Vec<Segment>, PluginError> {
+    async fn segments(&self, _ctx: &masterm_core::plugin::PromptContext) -> Result<Vec<Segment>, PluginError> {
         Ok(vec![])
     }
 

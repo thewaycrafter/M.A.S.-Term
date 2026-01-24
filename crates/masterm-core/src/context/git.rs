@@ -181,7 +181,8 @@ impl GitContext {
             return Ok((0, 0));
         }
 
-        let counts: Vec<&str> = String::from_utf8_lossy(&output.stdout)
+        let output_str = String::from_utf8_lossy(&output.stdout).to_string();
+        let counts: Vec<&str> = output_str
             .trim()
             .split('\t')
             .collect();

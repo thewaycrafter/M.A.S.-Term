@@ -12,15 +12,15 @@ use masterm_core::config::ShellType;
 pub struct InstallArgs {
     /// Shell to install for (auto-detect if not specified)
     #[arg(short, long)]
-    shell: Option<String>,
+    pub shell: Option<String>,
 
     /// Install system-wide (requires sudo)
     #[arg(long)]
-    global: bool,
+    pub global: bool,
 
     /// Skip shell integration (just install binary)
     #[arg(long)]
-    no_shell: bool,
+    pub no_shell: bool,
 }
 
 /// Uninstall command arguments

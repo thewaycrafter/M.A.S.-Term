@@ -10,7 +10,8 @@ mod loader;
 mod api;
 mod permissions;
 
-pub use api::{Plugin, PluginContext, PluginError};
+pub use api::{Plugin, PluginContext, PluginError, CommandAction, DetectionContext};
+pub use api::PromptContext;
 pub use loader::{PluginLoader, PluginManager};
 pub use permissions::{Permission, PermissionSet};
 
