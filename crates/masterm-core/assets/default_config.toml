@@ -1,0 +1,87 @@
+# MASTerm Configuration
+# https://masterm.dev/docs/configuration
+
+[core]
+# Mode: minimal, dev, ops
+mode = "dev"
+
+# Log level: trace, debug, info, warn, error
+log_level = "warn"
+
+[prompt]
+# Prompt format: powerline, simple, minimal
+format = "powerline"
+
+# Enable transient prompt
+transient = true
+
+# Add newline before prompt
+add_newline = true
+
+# Left prompt segments (order matters)
+left = ["directory", "git_branch", "git_status"]
+
+# Right prompt segments
+right = ["cmd_duration"]
+
+[prompt.icons]
+# Icon mode: auto, nerd, unicode, ascii, none
+mode = "auto"
+
+[prompt.colors]
+# Theme: catppuccin, dracula, nord
+theme = "catppuccin"
+
+[plugins]
+# Plugin registry URL
+# registry = "https://plugins.masterm.dev"
+
+# Explicitly enabled plugins (empty = auto-detect)
+enabled = []
+
+# Explicitly disabled plugins
+disabled = []
+
+# Git plugin config
+[plugins.git]
+show_stash = true
+show_ahead_behind = true
+truncate_branch = 30
+
+# Node plugin config
+[plugins.node]
+show_version = true
+
+[safety]
+# Enable production environment detection
+prod_detection = true
+
+# Patterns that indicate production environments
+prod_patterns = [
+    "**/prod/**",
+    "**/production/**",
+    "/var/www/**"
+]
+
+# Commands that require confirmation in production
+dangerous_commands = [
+    "rm -rf",
+    "DROP DATABASE",
+    "kubectl delete",
+    "terraform destroy",
+    "git push --force"
+]
+
+# Visual warning style: banner, background, border, icon
+warning_style = "banner"
+
+[cache]
+# Cache TTL in seconds
+ttl = 300
+
+# Max cache size in MB
+max_size = 100
+
+[telemetry]
+# Anonymous usage statistics (off by default)
+enabled = false

@@ -1,0 +1,10 @@
+[package]
+name = "masterm-shell"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "Shell adapters for MASTerm terminal framework"
+
+[dependencies]
+masterm-core = { path = "../masterm-core" }

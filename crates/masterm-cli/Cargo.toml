@@ -1,0 +1,34 @@
+[package]
+name = "masterm-cli"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "CLI binary for MASTerm terminal framework"
+
+[[bin]]
+name = "masterm"
+path = "src/main.rs"
+
+[dependencies]
+masterm-core = { path = "../masterm-core" }
+masterm-shell = { path = "../masterm-shell" }
+masterm-plugins = { path = "../masterm-plugins" }
+
+tokio.workspace = true
+clap.workspace = true
+clap_complete.workspace = true
+anyhow.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+console.workspace = true
+indicatif.workspace = true
+dirs.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+toml.workspace = true
+reqwest.workspace = true
+sha2.workspace = true
+chrono.workspace = true
+walkdir.workspace = true
