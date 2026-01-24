@@ -28,7 +28,10 @@ impl EnvironmentType {
         }
 
         // Check path against patterns
-        let path_str = cwd.to_string_lossy().to_lowercase();
+        let path_str = cwd
+            .to_string_lossy()
+            .to_lowercase()
+            .replace('\\', "/");
 
         // Check production patterns
         for pattern in prod_patterns {
