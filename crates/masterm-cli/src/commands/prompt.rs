@@ -7,14 +7,13 @@ use masterm_core::{
     context::ContextDetector,
     prompt::PromptRenderer,
 };
+use once_cell::sync::Lazy;
+use regex::Regex;
 use std::path::PathBuf;
 use std::time::Duration;
-use regex::Regex;
-use once_cell::sync::Lazy;
 
-static ANSI_REGEX: Lazy<Regex> = Lazy::new(|| {
-    Regex::new(r"\x1b\[[0-9;]*m").expect("Invalid regex")
-});
+static ANSI_REGEX: Lazy<Regex> =
+    Lazy::new(|| Regex::new(r"\x1b\[[0-9;]*m").expect("Invalid regex"));
 
 /// Prompt command arguments
 #[derive(Args)]
