@@ -11,12 +11,10 @@ pub mod mode;
 pub mod plugins;
 pub mod profile;
 pub mod prompt;
-pub mod sync;
 pub mod setup;
-pub mod welcome;
+pub mod sync;
 pub mod update;
-
-
+pub mod welcome;
 
 /// Output formatting helpers
 pub mod output {
@@ -57,6 +55,4 @@ pub mod output {
         println!("{}", style(text).bold());
         println!("{}", "═".repeat(60));
     }
-
-
 }

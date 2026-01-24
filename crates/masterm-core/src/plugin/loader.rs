@@ -1,6 +1,6 @@
 //! Plugin loader and manager
 
-use super::{Plugin, PluginContext, PluginManifest, DetectionContext, ActivationTrigger};
+use super::{ActivationTrigger, DetectionContext, Plugin, PluginContext, PluginManifest};
 use crate::prompt::Segment;
 use anyhow::Result;
 use std::collections::HashMap;
@@ -55,7 +55,7 @@ impl PluginLoader {
             if let Ok(entries) = std::fs::read_dir(dir) {
                 for entry in entries.filter_map(|e| e.ok()) {
                     let path = entry.path();
-                    
+
                     // Case 1: Directory with plugin.toml
                     if path.is_dir() {
                         let manifest_path = path.join("plugin.toml");
@@ -91,8 +91,10 @@ impl PluginLoader {
 
     /// Create a synthetic manifest for a standalone WASM file
     fn synthetic_manifest(&self, name: &str) -> PluginManifest {
-        use super::{PluginMeta, PluginRequirements, PluginPermissions, PluginActivation, PluginPerformance};
-        
+        use super::{
+            PluginActivation, PluginMeta, PluginPerformance, PluginPermissions, PluginRequirements,
+        };
+
         PluginManifest {
             plugin: PluginMeta {
                 name: name.to_string(),
@@ -245,16 +247,12 @@ pub fn _trigger_matches(trigger: &ActivationTrigger, ctx: &DetectionContext) -> 
         ActivationTrigger::FileExists { pattern } => {
             ctx.cwd.join(pattern).exists() || ctx.has_file_matching(pattern)
         }
-        ActivationTrigger::DirectoryExists { pattern } => {
-            ctx.cwd.join(pattern).is_dir()
-        }
-        ActivationTrigger::EnvVar { name, value } => {
-            match (ctx.env_vars.get(name), value) {
-                (Some(actual), Some(expected)) => actual == expected,
-                (Some(_), None) => true,
-                (None, _) => false,
-            }
-        }
+        ActivationTrigger::DirectoryExists { pattern } => ctx.cwd.join(pattern).is_dir(),
+        ActivationTrigger::EnvVar { name, value } => match (ctx.env_vars.get(name), value) {
+            (Some(actual), Some(expected)) => actual == expected,
+            (Some(_), None) => true,
+            (None, _) => false,
+        },
         ActivationTrigger::Always => true,
     }
 }

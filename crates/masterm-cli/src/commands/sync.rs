@@ -15,7 +15,7 @@ pub enum SyncAction {
         /// GitHub Personal Access Token (or ensure GITHUB_TOKEN env var is set)
         #[arg(long, env = "GITHUB_TOKEN")]
         token: Option<String>,
-        
+
         /// Description for the Gist
         #[arg(short, long, default_value = "MASTerm Configuration Backup")]
         description: String,
@@ -25,7 +25,7 @@ pub enum SyncAction {
     Pull {
         /// Gist ID to download from
         gist_id: String,
-        
+
         /// Overwrite local config without confirmation
         #[arg(long)]
         force: bool,
@@ -65,15 +65,17 @@ async fn push_config(token: Option<String>, description: &str) -> Result<()> {
         .context("Could not determine config path")?;
 
     if !config_path.exists() {
-        return Err(anyhow::anyhow!("No configuration file found at {}", config_path.display()));
+        return Err(anyhow::anyhow!(
+            "No configuration file found at {}",
+            config_path.display()
+        ));
     }
 
-    let content = std::fs::read_to_string(&config_path)
-        .context("Failed to read config file")?;
+    let content = std::fs::read_to_string(&config_path).context("Failed to read config file")?;
 
     // 3. Upload
     println!("{} Uploading config to GitHub Gist...", output::INFO);
-    
+
     let client = GistSync::new(Some(token))?;
     let url = client.upload(".masterm.toml", content, description).await?;
 
@@ -89,8 +91,8 @@ async fn pull_config(gist_id: &str, force: bool) -> Result<()> {
 
     // 1. Download
     println!("{} Downloading from Gist...", output::INFO);
-    
-    // Public download doesn't need token usually, but api limits apply. 
+
+    // Public download doesn't need token usually, but api limits apply.
     // For simplicity we create client without token for pull
     let client = GistSync::new(None)?;
     let content = client.download(gist_id, ".masterm.toml").await?;
@@ -101,12 +103,16 @@ async fn pull_config(gist_id: &str, force: bool) -> Result<()> {
         .context("Could not determine config path")?;
 
     if config_path.exists() && !force {
-        println!("{} Local config exists at {}", output::WARNING, config_path.display());
+        println!(
+            "{} Local config exists at {}",
+            output::WARNING,
+            config_path.display()
+        );
         print!("Overwrite? [y/N] ");
         std::io::stdout().flush()?;
         let mut input = String::new();
         std::io::stdin().read_line(&mut input)?;
-        
+
         if !input.trim().eq_ignore_ascii_case("y") {
             println!("Cancelled.");
             return Ok(());

@@ -94,7 +94,11 @@ impl Segment {
     }
 
     /// Set icon with fallback
-    pub fn icon_with_fallback(mut self, icon: impl Into<String>, fallback: impl Into<String>) -> Self {
+    pub fn icon_with_fallback(
+        mut self,
+        icon: impl Into<String>,
+        fallback: impl Into<String>,
+    ) -> Self {
         self.style.icon = Some(icon.into());
         self.style.icon_fallback = Some(fallback.into());
         self
@@ -103,14 +107,23 @@ impl Segment {
     /// Get display width (accounting for ANSI codes)
     pub fn display_width(&self) -> usize {
         // Count visible characters only
-        let icon_width = self.style.icon.as_ref().map(|i| i.chars().count() + 1).unwrap_or(0);
+        let icon_width = self
+            .style
+            .icon
+            .as_ref()
+            .map(|i| i.chars().count() + 1)
+            .unwrap_or(0);
         icon_width + self.content.chars().count()
     }
 
     /// Truncate content if needed
     pub fn truncate(&mut self, max_width: usize) {
         if self.content.chars().count() > max_width {
-            let truncated: String = self.content.chars().take(max_width.saturating_sub(1)).collect();
+            let truncated: String = self
+                .content
+                .chars()
+                .take(max_width.saturating_sub(1))
+                .collect();
             self.content = format!("{}…", truncated);
         }
     }

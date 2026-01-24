@@ -19,13 +19,13 @@ impl CacheManager {
         let cache_dir = dirs::home_dir()
             .map(|h| h.join(".masterm/cache.db"))
             .unwrap_or_else(|| PathBuf::from(".masterm_cache.db"));
-            
+
         let db = CacheDb::new(cache_dir)?;
         let manager = Self { db };
-        
+
         let mut instance = CACHE_INSTANCE.lock().unwrap();
         *instance = Some(manager);
-        
+
         Ok(())
     }
 
@@ -50,7 +50,7 @@ impl CacheManager {
             let _ = manager.db.set(key, value, None, ttl_secs);
         }
     }
-    
+
     pub fn clear() -> Result<()> {
         let guard = CACHE_INSTANCE.lock().unwrap();
         if let Some(manager) = guard.as_ref() {
@@ -58,7 +58,7 @@ impl CacheManager {
         }
         Ok(())
     }
-    
+
     pub fn stats() -> Result<(usize, usize)> {
         let guard = CACHE_INSTANCE.lock().unwrap();
         if let Some(manager) = guard.as_ref() {

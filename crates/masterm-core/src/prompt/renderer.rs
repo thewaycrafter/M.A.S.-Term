@@ -1,7 +1,7 @@
 //! Prompt renderer
 
-use super::{Position, Segment, SegmentStyle, Theme, Color};
-use crate::config::{IconMode, PromptConfig, ColorCapability};
+use super::{Color, Position, Segment, SegmentStyle, Theme};
+use crate::config::{ColorCapability, IconMode, PromptConfig};
 use crate::context::Context;
 use std::time::Duration;
 
@@ -57,7 +57,13 @@ impl PromptRenderer {
     }
 
     /// Render the prompt from context and segments
-    pub fn render(&self, context: &Context, segments: Vec<Segment>, exit_code: i32, duration: Duration) -> Prompt {
+    pub fn render(
+        &self,
+        context: &Context,
+        segments: Vec<Segment>,
+        exit_code: i32,
+        duration: Duration,
+    ) -> Prompt {
         let mut all_segments = segments;
 
         // Add built-in segments
@@ -95,14 +101,23 @@ impl PromptRenderer {
     }
 
     /// Generate built-in segments
-    fn builtin_segments(&self, context: &Context, exit_code: i32, duration: Duration) -> Vec<Segment> {
+    fn builtin_segments(
+        &self,
+        context: &Context,
+        exit_code: i32,
+        duration: Duration,
+    ) -> Vec<Segment> {
         let mut segments = Vec::new();
 
         // Directory segment
         let dir = self.format_directory(&context.cwd);
         segments.push(
             Segment::new("directory", dir)
-                .with_style(SegmentStyle::new().fg(self.theme.directory.clone()).icon(""))
+                .with_style(
+                    SegmentStyle::new()
+                        .fg(self.theme.directory.clone())
+                        .icon(""),
+                )
                 .with_priority(10),
         );
 
@@ -137,10 +152,12 @@ impl PromptRenderer {
 
             segments.push(
                 Segment::new("environment", content)
-                    .with_style(SegmentStyle::new()
-                        .fg(Color::Named(super::theme::NamedColor::White))
-                        .bg(color)
-                        .bold())
+                    .with_style(
+                        SegmentStyle::new()
+                            .fg(Color::Named(super::theme::NamedColor::White))
+                            .bg(color)
+                            .bold(),
+                    )
                     .with_priority(0), // Highest priority
             );
         }
@@ -151,9 +168,11 @@ impl PromptRenderer {
             let branch_icon = "";
             segments.push(
                 Segment::new("git_branch", &git.branch)
-                    .with_style(SegmentStyle::new()
-                        .fg(self.theme.git_branch.clone())
-                        .icon(branch_icon))
+                    .with_style(
+                        SegmentStyle::new()
+                            .fg(self.theme.git_branch.clone())
+                            .icon(branch_icon),
+                    )
                     .with_priority(50),
             );
 
@@ -244,7 +263,11 @@ impl PromptRenderer {
         if let Some(ref icon) = segment.style.icon {
             let display_icon = match self.icon_mode {
                 IconMode::Nerd => icon.clone(),
-                IconMode::Unicode => segment.style.icon_fallback.clone().unwrap_or_else(|| icon.clone()),
+                IconMode::Unicode => segment
+                    .style
+                    .icon_fallback
+                    .clone()
+                    .unwrap_or_else(|| icon.clone()),
                 IconMode::Ascii => segment.style.icon_fallback.clone().unwrap_or_default(),
                 IconMode::None => String::new(),
                 IconMode::Auto => icon.clone(), // Assume Nerd Fonts for auto
@@ -307,9 +330,15 @@ impl PromptRenderer {
             _ => {
                 // Auto-detect: check for Nerd Fonts hint
                 #[allow(clippy::if_same_then_else)]
-                if std::env::var("TERMX_ICONS").map(|v| v == "nerd").unwrap_or(false) {
+                if std::env::var("TERMX_ICONS")
+                    .map(|v| v == "nerd")
+                    .unwrap_or(false)
+                {
                     IconMode::Nerd
-                } else if std::env::var("TERM_PROGRAM").map(|t| t.contains("iTerm") || t.contains("Alacritty")).unwrap_or(false) {
+                } else if std::env::var("TERM_PROGRAM")
+                    .map(|t| t.contains("iTerm") || t.contains("Alacritty"))
+                    .unwrap_or(false)
+                {
                     IconMode::Nerd // Assume modern terminals have Nerd Fonts
                 } else {
                     IconMode::Auto // Fallback

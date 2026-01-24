@@ -45,7 +45,7 @@ async fn show_stats() -> Result<()> {
 
     println!("{:<25} {:>20}", "Cache path:", cache_path.display());
     println!("{:<25} {:>20}", "Cached entries:", count);
-    
+
     // Check actual file size
     let file_size = std::fs::metadata(&cache_path).map(|m| m.len()).unwrap_or(0);
     println!("{:<25} {:>20}", "Database size:", format_bytes(file_size));

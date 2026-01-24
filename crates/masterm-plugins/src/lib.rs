@@ -6,16 +6,16 @@
 //! - Production Guard: Safety warnings and confirmations
 //! - Language detection: Node, Python, Go, Rust, Java
 
-pub mod git;
-pub mod env;
-pub mod prod_guard;
-pub mod node;
-pub mod python;
-pub mod go;
-pub mod rust;
-pub mod java;
 pub mod docker;
+pub mod env;
+pub mod git;
+pub mod go;
+pub mod java;
 pub mod kubernetes;
+pub mod node;
+pub mod prod_guard;
+pub mod python;
+pub mod rust;
 
 use masterm_core::plugin::Plugin;
 

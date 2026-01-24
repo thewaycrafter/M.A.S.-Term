@@ -29,12 +29,17 @@ pub async fn run(_args: WelcomeArgs) -> Result<()> {
     let mut sys = System::new();
     sys.refresh_memory();
     sys.refresh_cpu();
-    
+
     // Simulate slight delay for CPU reading or just show static info
     let total_mem = sys.total_memory() as f64 / 1024.0 / 1024.0 / 1024.0;
     let used_mem = sys.used_memory() as f64 / 1024.0 / 1024.0 / 1024.0;
-    
-    println!("  🖥️  {} CPUs | {:.1} GB / {:.1} GB RAM", sys.cpus().len(), used_mem, total_mem);
+
+    println!(
+        "  🖥️  {} CPUs | {:.1} GB / {:.1} GB RAM",
+        sys.cpus().len(),
+        used_mem,
+        total_mem
+    );
     println!("  🚀 Version: v1.0.0");
     println!("  📢 Tip: Run 'masterm setup' to customize this shell.");
     println!();

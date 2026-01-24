@@ -3,9 +3,9 @@
 use async_trait::async_trait;
 use masterm_core::context::EnvironmentType;
 use masterm_core::plugin::{
-    Plugin, PluginContext, PluginError, PluginManifest, PluginMeta,
-    PluginRequirements, PluginPermissions, PluginActivation, PluginPerformance,
-    DetectionContext, CommandAction, ActivationTrigger,
+    ActivationTrigger, CommandAction, DetectionContext, Plugin, PluginActivation, PluginContext,
+    PluginError, PluginManifest, PluginMeta, PluginPerformance, PluginPermissions,
+    PluginRequirements,
 };
 use masterm_core::prompt::Segment;
 
@@ -55,34 +55,37 @@ impl ProdGuardPlugin {
                 "git push --force".to_string(),
                 "git push -f".to_string(),
             ],
-            blocked_commands: vec![
-                "rm -rf /".to_string(),
-                "rm -rf /*".to_string(),
-            ],
+            blocked_commands: vec!["rm -rf /".to_string(), "rm -rf /*".to_string()],
         }
     }
 
     fn is_production(&self, cwd: &std::path::Path) -> bool {
-        let env_type = EnvironmentType::detect(cwd, &[
-            "**/prod/**".to_string(),
-            "**/production/**".to_string(),
-        ]);
+        let env_type = EnvironmentType::detect(
+            cwd,
+            &["**/prod/**".to_string(), "**/production/**".to_string()],
+        );
         env_type.is_production()
     }
 
     fn matches_any(&self, cmd: &str, patterns: &[String]) -> bool {
         let cmd_lower = cmd.to_lowercase();
-        patterns.iter().any(|p| cmd_lower.contains(&p.to_lowercase()))
+        patterns
+            .iter()
+            .any(|p| cmd_lower.contains(&p.to_lowercase()))
     }
 }
 
 impl Default for ProdGuardPlugin {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 #[async_trait]
 impl Plugin for ProdGuardPlugin {
-    fn manifest(&self) -> &PluginManifest { &self.manifest }
+    fn manifest(&self) -> &PluginManifest {
+        &self.manifest
+    }
 
     async fn init(&mut self, ctx: &PluginContext) -> Result<(), PluginError> {
         if let Ok(patterns) = ctx.get_string_list("dangerous_commands") {
@@ -98,7 +101,10 @@ impl Plugin for ProdGuardPlugin {
         self.is_production(&ctx.cwd)
     }
 
-    async fn segments(&self, _ctx: &masterm_core::plugin::PromptContext) -> Result<Vec<Segment>, PluginError> {
+    async fn segments(
+        &self,
+        _ctx: &masterm_core::plugin::PromptContext,
+    ) -> Result<Vec<Segment>, PluginError> {
         Ok(vec![])
     }
 
@@ -127,5 +133,7 @@ impl Plugin for ProdGuardPlugin {
         CommandAction::Allow
     }
 
-    async fn cleanup(&mut self) -> Result<(), PluginError> { Ok(()) }
+    async fn cleanup(&mut self) -> Result<(), PluginError> {
+        Ok(())
+    }
 }

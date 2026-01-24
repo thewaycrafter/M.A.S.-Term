@@ -1,9 +1,9 @@
 //! Profile command for performance analysis
 
-use std::time::Instant;
 use anyhow::Result;
 use clap::Subcommand;
 use console::style;
+use std::time::Instant;
 
 /// Profile subcommands
 #[derive(Subcommand)]
@@ -54,9 +54,10 @@ async fn profile_startup() -> Result<()> {
     timings.push(("Prompt render", start.elapsed()));
 
     // Display results
-    println!("{:<30} {:>10} {:>10}", 
-        style("Phase").bold(), 
-        style("Time").bold(), 
+    println!(
+        "{:<30} {:>10} {:>10}",
+        style("Phase").bold(),
+        style("Time").bold(),
         style("% of Total").bold()
     );
     println!("{}", "─".repeat(60));
@@ -127,11 +128,27 @@ async fn profile_prompt() -> Result<()> {
     let min = durations.iter().min().unwrap();
     let max = durations.iter().max().unwrap();
 
-    println!("{:<20} {:>15}", style("Metric").bold(), style("Value").bold());
+    println!(
+        "{:<20} {:>15}",
+        style("Metric").bold(),
+        style("Value").bold()
+    );
     println!("{}", "─".repeat(40));
-    println!("{:<20} {:>15}", "Average", format!("{:.1}ms", avg.as_micros() as f64 / 1000.0));
-    println!("{:<20} {:>15}", "Min", format!("{:.1}ms", min.as_micros() as f64 / 1000.0));
-    println!("{:<20} {:>15}", "Max", format!("{:.1}ms", max.as_micros() as f64 / 1000.0));
+    println!(
+        "{:<20} {:>15}",
+        "Average",
+        format!("{:.1}ms", avg.as_micros() as f64 / 1000.0)
+    );
+    println!(
+        "{:<20} {:>15}",
+        "Min",
+        format!("{:.1}ms", min.as_micros() as f64 / 1000.0)
+    );
+    println!(
+        "{:<20} {:>15}",
+        "Max",
+        format!("{:.1}ms", max.as_micros() as f64 / 1000.0)
+    );
 
     println!("\nTarget: <30ms");
 
@@ -155,9 +172,10 @@ async fn profile_plugins() -> Result<()> {
         ("go", 1.5, "inactive"),
     ];
 
-    println!("{:<20} {:>10} {:>15}", 
-        style("Plugin").bold(), 
-        style("Load Time").bold(), 
+    println!(
+        "{:<20} {:>10} {:>15}",
+        style("Plugin").bold(),
+        style("Load Time").bold(),
         style("Status").bold()
     );
     println!("{}", "─".repeat(50));
@@ -170,7 +188,12 @@ async fn profile_plugins() -> Result<()> {
             _ => style(*status).dim(),
         };
 
-        println!("{:<20} {:>10} {:>15}", name, format!("{:.1}ms", time), status_styled);
+        println!(
+            "{:<20} {:>10} {:>15}",
+            name,
+            format!("{:.1}ms", time),
+            status_styled
+        );
 
         if *status == "active" {
             total += time;
@@ -178,7 +201,11 @@ async fn profile_plugins() -> Result<()> {
     }
 
     println!("{}", "─".repeat(50));
-    println!("{:<20} {:>10}", style("Total (active)").bold(), format!("{:.1}ms", total));
+    println!(
+        "{:<20} {:>10}",
+        style("Total (active)").bold(),
+        format!("{:.1}ms", total)
+    );
 
     println!("\nTarget: <10ms per plugin");
 

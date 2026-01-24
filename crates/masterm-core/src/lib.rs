@@ -4,9 +4,9 @@
 //! Provides configuration, context detection, prompt rendering,
 //! plugin management, and safety features.
 
-pub mod error;
 pub mod cache;
 pub mod cloud;
+pub mod error;
 
 pub use error::{CoreError, Result};
 pub mod config;

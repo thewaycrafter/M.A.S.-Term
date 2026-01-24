@@ -11,5 +11,5 @@ mod segment;
 pub mod theme;
 
 pub use renderer::{Prompt, PromptRenderer};
-pub use segment::{Segment, SegmentStyle, Position};
-pub use theme::{Theme, Color, NamedColor};
+pub use segment::{Position, Segment, SegmentStyle};
+pub use theme::{Color, NamedColor, Theme};

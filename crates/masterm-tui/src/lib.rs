@@ -6,8 +6,8 @@
 //! - Plugin management
 
 pub mod app;
-pub mod ui;
 pub mod events;
+pub mod ui;
 pub mod widgets;
 
 use anyhow::Result;

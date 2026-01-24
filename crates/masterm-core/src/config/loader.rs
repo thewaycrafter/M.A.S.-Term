@@ -72,8 +72,7 @@ impl ConfigLoader {
         let content = std::fs::read_to_string(path)
             .with_context(|| format!("Failed to read config file: {:?}", path))?;
 
-        toml::from_str(&content)
-            .with_context(|| format!("Failed to parse config file: {:?}", path))
+        toml::from_str(&content).with_context(|| format!("Failed to parse config file: {:?}", path))
     }
 
     /// Load enterprise configuration
@@ -121,12 +120,19 @@ impl ConfigLoader {
     }
 
     /// Apply enterprise lockdown settings
-    fn apply_enterprise_lockdown(&self, mut config: Config, enterprise: &EnterpriseConfig) -> Config {
+    fn apply_enterprise_lockdown(
+        &self,
+        mut config: Config,
+        enterprise: &EnterpriseConfig,
+    ) -> Config {
         if !enterprise.enterprise.enabled {
             return config;
         }
 
-        info!("Enterprise mode enabled for org: {}", enterprise.enterprise.org_id);
+        info!(
+            "Enterprise mode enabled for org: {}",
+            enterprise.enterprise.org_id
+        );
 
         // Apply locked settings
         for setting in &enterprise.lockdown.locked_settings {

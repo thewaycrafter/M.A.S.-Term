@@ -2,10 +2,10 @@
 //!
 //! This crate provides thin integration layers for different shells.
 
-pub mod zsh;
 pub mod bash;
 pub mod fish;
 pub mod powershell;
+pub mod zsh;
 
 /// Get initialization script for a shell
 pub fn get_init_script(shell: &str) -> &'static str {

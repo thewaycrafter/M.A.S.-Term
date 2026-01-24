@@ -119,7 +119,11 @@ impl KubernetesContext {
             .ok()
             .map(|o| {
                 let ns = String::from_utf8_lossy(&o.stdout).trim().to_string();
-                if ns.is_empty() { "default".to_string() } else { ns }
+                if ns.is_empty() {
+                    "default".to_string()
+                } else {
+                    ns
+                }
             })
             .unwrap_or_else(|| "default".to_string());
 
@@ -131,7 +135,6 @@ impl KubernetesContext {
         let ctx = self.context.to_lowercase();
         let ns = self.namespace.to_lowercase();
 
-        ctx.contains("prod") || ctx.contains("prd") ||
-        ns.contains("prod") || ns.contains("prd")
+        ctx.contains("prod") || ctx.contains("prd") || ns.contains("prod") || ns.contains("prd")
     }
 }

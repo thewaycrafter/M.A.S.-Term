@@ -1,10 +1,10 @@
 //! Safety guards for production environments
 
-mod prod_guard;
 mod command_filter;
+mod prod_guard;
 
-pub use prod_guard::ProdGuard;
 pub use command_filter::CommandFilter;
+pub use prod_guard::ProdGuard;
 
 use crate::plugin::CommandAction;
 

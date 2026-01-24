@@ -4,8 +4,8 @@ use super::output;
 use anyhow::Result;
 use clap::Args;
 use console::style;
-use std::path::{Path, PathBuf};
 use masterm_core::config::ShellType;
+use std::path::{Path, PathBuf};
 
 /// Install command arguments
 #[derive(Args)]
@@ -123,13 +123,22 @@ fn install_shell_integration(shell: ShellType, masterm_dir: &Path) -> Result<()>
     // Write shell scripts
     match shell {
         ShellType::Zsh => {
-            std::fs::write(shell_dir.join("init.zsh"), include_str!("../../shell/init.zsh"))?;
+            std::fs::write(
+                shell_dir.join("init.zsh"),
+                include_str!("../../shell/init.zsh"),
+            )?;
         }
         ShellType::Bash => {
-            std::fs::write(shell_dir.join("init.bash"), include_str!("../../shell/init.bash"))?;
+            std::fs::write(
+                shell_dir.join("init.bash"),
+                include_str!("../../shell/init.bash"),
+            )?;
         }
         ShellType::Fish => {
-            std::fs::write(shell_dir.join("init.fish"), include_str!("../../shell/init.fish"))?;
+            std::fs::write(
+                shell_dir.join("init.fish"),
+                include_str!("../../shell/init.fish"),
+            )?;
         }
         _ => {}
     }
@@ -149,9 +158,7 @@ fn add_shell_init(shell: ShellType) -> Result<()> {
     let content = std::fs::read_to_string(&rc_path)?;
 
     if !content.contains("masterm init") {
-        let mut file = std::fs::OpenOptions::new()
-            .append(true)
-            .open(&rc_path)?;
+        let mut file = std::fs::OpenOptions::new().append(true).open(&rc_path)?;
 
         use std::io::Write;
         writeln!(file, "\n# MASTerm - Master your Terminal")?;
@@ -187,8 +194,7 @@ fn remove_shell_init(shell: ShellType) -> Result<()> {
 
 /// Get shell RC file path and init line
 fn get_shell_rc_info(shell: ShellType) -> Result<(PathBuf, String)> {
-    let home = dirs::home_dir()
-        .ok_or_else(|| anyhow::anyhow!("Cannot find home directory"))?;
+    let home = dirs::home_dir().ok_or_else(|| anyhow::anyhow!("Cannot find home directory"))?;
 
     match shell {
         ShellType::Zsh => Ok((

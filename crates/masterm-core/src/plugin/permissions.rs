@@ -15,8 +15,6 @@ pub enum Permission {
     Write,
 }
 
-
-
 impl Permission {
     /// Check if this permission allows reading
     pub fn can_read(&self) -> bool {
@@ -104,14 +102,16 @@ impl PermissionSet {
 
     /// Create from plugin permissions config
     pub fn from_config(config: &super::PluginPermissions) -> Self {
-        let filesystem = config.filesystem
+        let filesystem = config
+            .filesystem
             .first()
             .and_then(|s| Permission::parse_from_str(s))
             .unwrap_or_default();
 
         let network = Permission::parse_from_str(&config.network).unwrap_or_default();
 
-        let environment = config.environment
+        let environment = config
+            .environment
             .first()
             .and_then(|s| Permission::parse_from_str(s))
             .unwrap_or_default();

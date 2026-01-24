@@ -83,9 +83,11 @@ impl LanguageContext {
             .or_else(|| Self::get_command_version("python", &["--version"]));
 
         let package_name = if in_venv {
-            std::env::var("VIRTUAL_ENV")
-                .ok()
-                .and_then(|p| Path::new(&p).file_name().map(|s| s.to_string_lossy().to_string()))
+            std::env::var("VIRTUAL_ENV").ok().and_then(|p| {
+                Path::new(&p)
+                    .file_name()
+                    .map(|s| s.to_string_lossy().to_string())
+            })
         } else {
             None
         };
@@ -186,15 +188,13 @@ impl LanguageContext {
 
     /// Get package name from package.json (simple parsing without serde_json)
     fn get_package_json_name(path: &Path) -> Option<String> {
-        std::fs::read_to_string(path)
-            .ok()
-            .and_then(|content| {
-                // Simple regex-based extraction of "name" field
-                let re = regex::Regex::new(r#""name"\s*:\s*"([^"]+)""#).ok()?;
-                re.captures(&content)
-                    .and_then(|caps| caps.get(1))
-                    .map(|m| m.as_str().to_string())
-            })
+        std::fs::read_to_string(path).ok().and_then(|content| {
+            // Simple regex-based extraction of "name" field
+            let re = regex::Regex::new(r#""name"\s*:\s*"([^"]+)""#).ok()?;
+            re.captures(&content)
+                .and_then(|caps| caps.get(1))
+                .map(|m| m.as_str().to_string())
+        })
     }
 
     /// Get package name from Cargo.toml

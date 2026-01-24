@@ -49,11 +49,7 @@ impl ProdGuard {
     }
 
     /// Create with custom patterns
-    pub fn with_patterns(
-        mut self,
-        dangerous: Vec<String>,
-        blocked: Vec<String>,
-    ) -> Self {
+    pub fn with_patterns(mut self, dangerous: Vec<String>, blocked: Vec<String>) -> Self {
         self.dangerous_patterns.extend(dangerous);
         self.blocked_patterns.extend(blocked);
         self
@@ -67,7 +63,9 @@ impl ProdGuard {
     /// Check if command matches any patterns
     fn matches_any(&self, command: &str, patterns: &[String]) -> bool {
         let cmd_lower = command.to_lowercase();
-        patterns.iter().any(|p| cmd_lower.contains(&p.to_lowercase()))
+        patterns
+            .iter()
+            .any(|p| cmd_lower.contains(&p.to_lowercase()))
     }
 
     /// Format confirmation message
@@ -120,7 +118,7 @@ impl SafetyGuard for ProdGuard {
             }
             // In staging: just warn
             return CommandAction::Warn(
-                "\x1b[33m⚠️  Warning: This command may be dangerous in staging.\x1b[0m".to_string()
+                "\x1b[33m⚠️  Warning: This command may be dangerous in staging.\x1b[0m".to_string(),
             );
         }
 

@@ -58,7 +58,10 @@ async fn show_config(effective: bool) -> Result<()> {
     } else {
         // Show raw config file
         if config_path.exists() {
-            println!("{}", style(format!("Config: {}", config_path.display())).dim());
+            println!(
+                "{}",
+                style(format!("Config: {}", config_path.display())).dim()
+            );
             println!("{}", "─".repeat(40));
             println!("{}", std::fs::read_to_string(&config_path)?);
         } else {
@@ -83,7 +86,8 @@ async fn edit_config() -> Result<()> {
             shell: None,
             global: false,
             no_shell: true,
-        }).await?;
+        })
+        .await?;
     }
 
     // Open in editor
@@ -142,7 +146,8 @@ async fn reset_config(force: bool) -> Result<()> {
         shell: None,
         global: false,
         no_shell: true,
-    }).await?;
+    })
+    .await?;
 
     output::success("Configuration reset to defaults");
 

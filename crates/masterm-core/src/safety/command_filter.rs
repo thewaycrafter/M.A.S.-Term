@@ -63,10 +63,7 @@ impl CommandFilter {
     }
 
     /// Create filter from config patterns
-    pub fn from_config(
-        dangerous: &[String],
-        blocked: &[String],
-    ) -> Self {
+    pub fn from_config(dangerous: &[String], blocked: &[String]) -> Self {
         let mut filter = Self::new();
 
         for pattern in blocked {

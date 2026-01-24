@@ -2,11 +2,11 @@
 
 use async_trait::async_trait;
 use masterm_core::plugin::{
-    Plugin, PluginContext, PluginError, PluginManifest, PluginMeta,
-    PluginRequirements, PluginPermissions, PluginActivation, PluginPerformance,
-    DetectionContext, CommandAction, ActivationTrigger,
+    ActivationTrigger, CommandAction, DetectionContext, Plugin, PluginActivation, PluginContext,
+    PluginError, PluginManifest, PluginMeta, PluginPerformance, PluginPermissions,
+    PluginRequirements,
 };
-use masterm_core::prompt::{Segment, SegmentStyle, Color, NamedColor};
+use masterm_core::prompt::{Color, NamedColor, Segment, SegmentStyle};
 use std::process::Command;
 
 /// Git plugin for displaying repository information
@@ -40,9 +40,9 @@ impl GitPlugin {
                     execute: vec!["git".to_string()],
                 },
                 activation: PluginActivation {
-                    triggers: vec![
-                        ActivationTrigger::DirectoryExists { pattern: ".git".to_string() },
-                    ],
+                    triggers: vec![ActivationTrigger::DirectoryExists {
+                        pattern: ".git".to_string(),
+                    }],
                     mode: "auto".to_string(),
                 },
                 performance: PluginPerformance {
@@ -89,13 +89,21 @@ impl GitPlugin {
         if let Some(output) = output {
             if output.status.success() {
                 for line in String::from_utf8_lossy(&output.stdout).lines() {
-                    if line.len() < 2 { continue; }
+                    if line.len() < 2 {
+                        continue;
+                    }
                     let first = line.chars().next().unwrap_or(' ');
                     let second = line.chars().nth(1).unwrap_or(' ');
 
-                    if first != ' ' && first != '?' { staged += 1; }
-                    if second == 'M' || second == 'D' { modified += 1; }
-                    if first == '?' { untracked += 1; }
+                    if first != ' ' && first != '?' {
+                        staged += 1;
+                    }
+                    if second == 'M' || second == 'D' {
+                        modified += 1;
+                    }
+                    if first == '?' {
+                        untracked += 1;
+                    }
                 }
             }
         }
@@ -137,7 +145,10 @@ impl Plugin for GitPlugin {
         ctx.cwd.join(".git").exists() || self.is_git_repo(&ctx.cwd)
     }
 
-    async fn segments(&self, ctx: &masterm_core::plugin::PromptContext) -> Result<Vec<Segment>, PluginError> {
+    async fn segments(
+        &self,
+        ctx: &masterm_core::plugin::PromptContext,
+    ) -> Result<Vec<Segment>, PluginError> {
         let mut segments = Vec::new();
 
         if let Some(branch) = self.get_branch(&ctx.cwd) {
@@ -154,7 +165,7 @@ impl Plugin for GitPlugin {
                         prefix: None,
                         suffix: None,
                     })
-                    .with_priority(50)
+                    .with_priority(50),
             );
         }
 
@@ -165,9 +176,15 @@ impl Plugin for GitPlugin {
             "✓".to_string()
         } else {
             let mut parts = Vec::new();
-            if staged > 0 { parts.push(format!("+{}", staged)); }
-            if modified > 0 { parts.push(format!("~{}", modified)); }
-            if untracked > 0 { parts.push(format!("?{}", untracked)); }
+            if staged > 0 {
+                parts.push(format!("+{}", staged));
+            }
+            if modified > 0 {
+                parts.push(format!("~{}", modified));
+            }
+            if untracked > 0 {
+                parts.push(format!("?{}", untracked));
+            }
             parts.join(" ")
         };
 
@@ -183,7 +200,7 @@ impl Plugin for GitPlugin {
                     fg: Some(status_color),
                     ..Default::default()
                 })
-                .with_priority(51)
+                .with_priority(51),
         );
 
         Ok(segments)

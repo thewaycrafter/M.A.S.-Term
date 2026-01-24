@@ -18,7 +18,7 @@ pub async fn run(args: InitArgs) -> Result<()> {
         // Log error but continue - don't crash shell init
         eprintln!("Failed to initialize cache: {}", e);
     }
-    
+
     let shell = ShellType::from_path(&args.shell);
 
     let script = match shell {
@@ -80,7 +80,8 @@ PROMPT="$(masterm prompt --shell zsh --exit-code 0 --duration 0)"
 
 # Show welcome screen
 masterm welcome
-"#.to_string()
+"#
+    .to_string()
 }
 
 /// Generate Bash initialization script
@@ -116,7 +117,8 @@ PS1="$(masterm prompt --shell bash --exit-code 0 --duration 0)"
 
 # Show welcome screen
 masterm welcome
-"#.to_string()
+"#
+    .to_string()
 }
 
 /// Generate Fish initialization script
@@ -141,5 +143,6 @@ function fish_mode_prompt; end
 
 # Show welcome screen
 masterm welcome
-"#.to_string()
+"#
+    .to_string()
 }

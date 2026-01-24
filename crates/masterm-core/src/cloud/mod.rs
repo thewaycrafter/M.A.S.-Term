@@ -1,7 +1,7 @@
 //! Cloud synchronization using GitHub Gists
 
 use anyhow::{Context, Result};
-use reqwest::header::{HeaderMap, HeaderValue, AUTHORIZATION, USER_AGENT, CONTENT_TYPE};
+use reqwest::header::{HeaderMap, HeaderValue, AUTHORIZATION, CONTENT_TYPE, USER_AGENT};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
@@ -58,16 +58,18 @@ impl GistSync {
         Ok(Self { client, token })
     }
 
-    pub async fn upload(&self, filename: &str, content: String, description: &str) -> Result<String> {
+    pub async fn upload(
+        &self,
+        filename: &str,
+        content: String,
+        description: &str,
+    ) -> Result<String> {
         if self.token.is_none() {
             return Err(anyhow::anyhow!("GitHub token required for upload"));
         }
 
         let mut files = HashMap::new();
-        files.insert(
-            filename.to_string(),
-            GistFileContent { content },
-        );
+        files.insert(filename.to_string(), GistFileContent { content });
 
         let request = CreateGistRequest {
             description: description.to_string(),
@@ -75,7 +77,8 @@ impl GistSync {
             files,
         };
 
-        let response = self.client
+        let response = self
+            .client
             .post("https://api.github.com/gists")
             .json(&request)
             .send()
@@ -97,15 +100,19 @@ impl GistSync {
 
     pub async fn download(&self, gist_id: &str, filename: &str) -> Result<String> {
         let url = format!("https://api.github.com/gists/{}", gist_id);
-        
-        let response = self.client
+
+        let response = self
+            .client
             .get(&url)
             .send()
             .await
             .context("Failed to fetch Gist")?;
 
         if !response.status().is_success() {
-            return Err(anyhow::anyhow!("Failed to fetch Gist: {}", response.status()));
+            return Err(anyhow::anyhow!(
+                "Failed to fetch Gist: {}",
+                response.status()
+            ));
         }
 
         let gist: GetGistResponse = response
@@ -113,7 +120,9 @@ impl GistSync {
             .await
             .context("Failed to parse Gist response")?;
 
-        let file = gist.files.get(filename)
+        let file = gist
+            .files
+            .get(filename)
             .ok_or_else(|| anyhow::anyhow!("File '{}' not found in Gist", filename))?;
 
         Ok(file.content.clone())

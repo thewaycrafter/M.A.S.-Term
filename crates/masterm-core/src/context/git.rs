@@ -1,10 +1,10 @@
 //! Git repository context detection
 
 use anyhow::Result;
+use serde::{Deserialize, Serialize};
 use std::path::Path;
 use std::process::Command;
 use std::time::UNIX_EPOCH;
-use serde::{Serialize, Deserialize};
 
 /// Git repository context
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -55,7 +55,7 @@ impl GitContext {
         }
 
         let repo_root = Self::get_repo_root(cwd).unwrap_or_else(|| cwd.display().to_string());
-        
+
         // Cache key
         let cache_key = format!("git_status:{}", repo_root);
 
@@ -93,7 +93,7 @@ impl GitContext {
     /// Check if cache is fresh by comparing timestamps with git files
     fn is_cache_fresh(root: &Path, cache_ts: u64) -> bool {
         let files = [".git/index", ".git/HEAD", ".git/refs/heads"];
-        
+
         for file in files {
             let p = root.join(file);
             if let Ok(metadata) = std::fs::metadata(&p) {
@@ -102,7 +102,7 @@ impl GitContext {
                         .duration_since(UNIX_EPOCH)
                         .unwrap_or_default()
                         .as_secs();
-                    
+
                     if mod_ts > cache_ts {
                         return false;
                     }
@@ -164,7 +164,9 @@ impl GitContext {
             .output()?;
 
         if output.status.success() {
-            Ok(Some(String::from_utf8_lossy(&output.stdout).trim().to_string()))
+            Ok(Some(
+                String::from_utf8_lossy(&output.stdout).trim().to_string(),
+            ))
         } else {
             // Try to get short SHA for detached HEAD
             let output = Command::new("git")
@@ -173,7 +175,10 @@ impl GitContext {
                 .output()?;
 
             if output.status.success() {
-                Ok(Some(format!(":{}", String::from_utf8_lossy(&output.stdout).trim())))
+                Ok(Some(format!(
+                    ":{}",
+                    String::from_utf8_lossy(&output.stdout).trim()
+                )))
             } else {
                 Ok(None)
             }
@@ -206,7 +211,11 @@ impl GitContext {
             let worktree = line.chars().nth(1).unwrap_or(' ');
 
             // Check for conflicts
-            if index == 'U' || worktree == 'U' || (index == 'A' && worktree == 'A') || (index == 'D' && worktree == 'D') {
+            if index == 'U'
+                || worktree == 'U'
+                || (index == 'A' && worktree == 'A')
+                || (index == 'D' && worktree == 'D')
+            {
                 conflict = true;
             }
 
@@ -241,10 +250,7 @@ impl GitContext {
         }
 
         let output_str = String::from_utf8_lossy(&output.stdout).to_string();
-        let counts: Vec<&str> = output_str
-            .trim()
-            .split('\t')
-            .collect();
+        let counts: Vec<&str> = output_str.trim().split('\t').collect();
 
         if counts.len() == 2 {
             let ahead = counts[0].parse().unwrap_or(0);

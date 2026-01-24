@@ -72,7 +72,10 @@ async fn set_mode(mode_str: &str) -> Result<()> {
     // Update mode
     if let Some(core) = config.get_mut("core") {
         if let Some(table) = core.as_table_mut() {
-            table.insert("mode".to_string(), toml::Value::String(mode.name().to_string()));
+            table.insert(
+                "mode".to_string(),
+                toml::Value::String(mode.name().to_string()),
+            );
         }
     }
 

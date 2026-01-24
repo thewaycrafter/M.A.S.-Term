@@ -23,9 +23,9 @@ impl CacheDb {
         if let Some(parent) = path.parent() {
             std::fs::create_dir_all(parent)?;
         }
-        
+
         let conn = Connection::open(&path)?;
-        
+
         conn.execute(
             "CREATE TABLE IF NOT EXISTS cache (
                 key TEXT PRIMARY KEY,
@@ -36,7 +36,7 @@ impl CacheDb {
             )",
             [],
         )?;
-        
+
         Ok(Self { conn })
     }
 
@@ -75,7 +75,7 @@ impl CacheDb {
             .duration_since(UNIX_EPOCH)
             .unwrap()
             .as_secs();
-        
+
         let expires_at = now + ttl_secs;
 
         self.conn.execute(
@@ -93,12 +93,10 @@ impl CacheDb {
     }
 
     pub fn stats(&self) -> Result<(usize, usize)> {
-        let count: usize = self.conn.query_row(
-            "SELECT COUNT(*) FROM cache",
-            [],
-            |row| row.get(0),
-        )?;
-        
+        let count: usize = self
+            .conn
+            .query_row("SELECT COUNT(*) FROM cache", [], |row| row.get(0))?;
+
         // This is a rough estimation of size in bytes (just counting rows isn't size, but usually sufficient for simple stats)
         // For real size we check the file size
         Ok((count, 0))

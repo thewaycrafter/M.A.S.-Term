@@ -5,13 +5,13 @@
 //! 2. User config (`~/.masterm.toml`)
 //! 3. Project config (`.masterm.toml` in current directory)
 
+mod enterprise;
 mod loader;
 mod schema;
-mod enterprise;
 
+pub use enterprise::EnterpriseConfig;
 pub use loader::ConfigLoader;
 pub use schema::*;
-pub use enterprise::EnterpriseConfig;
 
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
@@ -61,7 +61,11 @@ impl Default for CoreConfig {
         Self {
             shell: "auto".to_string(),
             mode: "dev".to_string(),
-            features: vec!["prompt".to_string(), "plugins".to_string(), "safety".to_string()],
+            features: vec![
+                "prompt".to_string(),
+                "plugins".to_string(),
+                "safety".to_string(),
+            ],
             log_level: "warn".to_string(),
         }
     }

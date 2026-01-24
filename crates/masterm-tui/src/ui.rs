@@ -33,8 +33,16 @@ fn draw_header(f: &mut Frame, app: &App, area: Rect) {
         .collect();
 
     let tabs = Tabs::new(titles)
-        .block(Block::default().borders(Borders::ALL).title(app.title.as_str()))
-        .highlight_style(Style::default().fg(Color::Cyan).add_modifier(Modifier::BOLD))
+        .block(
+            Block::default()
+                .borders(Borders::ALL)
+                .title(app.title.as_str()),
+        )
+        .highlight_style(
+            Style::default()
+                .fg(Color::Cyan)
+                .add_modifier(Modifier::BOLD),
+        )
         .select(match app.tab {
             Tab::Dashboard => 0,
             Tab::Config => 1,
@@ -56,20 +64,26 @@ fn draw_config(f: &mut Frame, app: &App, area: Rect) {
     let rows: Vec<ratatui::widgets::Row> = app
         .config_items
         .iter()
-        .map(|(k, v)| {
-            ratatui::widgets::Row::new(vec![k.clone(), v.clone()])
-        })
+        .map(|(k, v)| ratatui::widgets::Row::new(vec![k.clone(), v.clone()]))
         .collect();
 
     let widths = [Constraint::Percentage(30), Constraint::Percentage(70)];
-    
+
     let table = ratatui::widgets::Table::new(rows, widths)
         .header(
             ratatui::widgets::Row::new(vec!["Key", "Value"])
-                .style(Style::default().fg(Color::Yellow).add_modifier(Modifier::BOLD))
+                .style(
+                    Style::default()
+                        .fg(Color::Yellow)
+                        .add_modifier(Modifier::BOLD),
+                )
                 .bottom_margin(1),
         )
-        .block(Block::default().borders(Borders::ALL).title("Configuration"))
+        .block(
+            Block::default()
+                .borders(Borders::ALL)
+                .title("Configuration"),
+        )
         .column_spacing(1);
 
     f.render_widget(table, area);
@@ -84,15 +98,27 @@ fn draw_plugins(f: &mut Frame, app: &App, area: Rect) {
         })
         .collect();
 
-    let widths = [Constraint::Percentage(20), Constraint::Percentage(15), Constraint::Percentage(65)];
-    
+    let widths = [
+        Constraint::Percentage(20),
+        Constraint::Percentage(15),
+        Constraint::Percentage(65),
+    ];
+
     let table = ratatui::widgets::Table::new(rows, widths)
         .header(
             ratatui::widgets::Row::new(vec!["Name", "Version", "Description"])
-                .style(Style::default().fg(Color::Yellow).add_modifier(Modifier::BOLD))
+                .style(
+                    Style::default()
+                        .fg(Color::Yellow)
+                        .add_modifier(Modifier::BOLD),
+                )
                 .bottom_margin(1),
         )
-        .block(Block::default().borders(Borders::ALL).title("Installed Plugins"))
+        .block(
+            Block::default()
+                .borders(Borders::ALL)
+                .title("Installed Plugins"),
+        )
         .column_spacing(1);
 
     f.render_widget(table, area);
@@ -123,7 +149,11 @@ fn draw_dashboard(f: &mut Frame, app: &App, area: Rect) {
     let total_mem = app.system.total_memory();
     let mem_percent = (used_mem as f64 / total_mem as f64 * 100.0) as u16;
 
-    let mem_label = format!("{:.1} GB / {:.1} GB", used_mem as f64 / 1024.0 / 1024.0 / 1024.0, total_mem as f64 / 1024.0 / 1024.0 / 1024.0);
+    let mem_label = format!(
+        "{:.1} GB / {:.1} GB",
+        used_mem as f64 / 1024.0 / 1024.0 / 1024.0,
+        total_mem as f64 / 1024.0 / 1024.0 / 1024.0
+    );
     let mem_gauge = ratatui::widgets::Gauge::default()
         .block(Block::default().title("Memory Usage").borders(Borders::ALL))
         .gauge_style(Style::default().fg(Color::Cyan))
@@ -136,6 +166,6 @@ fn draw_footer(f: &mut Frame, _app: &App, area: Rect) {
     let p = Paragraph::new("Press 'q' to quit | '1'-'3' to switch tabs")
         .style(Style::default().fg(Color::Gray))
         .block(Block::default().borders(Borders::ALL));
-    
+
     f.render_widget(p, area);
 }

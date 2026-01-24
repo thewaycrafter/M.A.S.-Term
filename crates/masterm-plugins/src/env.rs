@@ -3,11 +3,11 @@
 use async_trait::async_trait;
 use masterm_core::context::EnvironmentType;
 use masterm_core::plugin::{
-    Plugin, PluginContext, PluginError, PluginManifest, PluginMeta,
-    PluginRequirements, PluginPermissions, PluginActivation, PluginPerformance,
-    DetectionContext, CommandAction, ActivationTrigger,
+    ActivationTrigger, CommandAction, DetectionContext, Plugin, PluginActivation, PluginContext,
+    PluginError, PluginManifest, PluginMeta, PluginPerformance, PluginPermissions,
+    PluginRequirements,
 };
-use masterm_core::prompt::{Segment, SegmentStyle, Color, NamedColor};
+use masterm_core::prompt::{Color, NamedColor, Segment, SegmentStyle};
 
 /// Environment detection plugin
 pub struct EnvPlugin {
@@ -46,52 +46,63 @@ impl EnvPlugin {
     }
 
     fn detect_env(&self, cwd: &std::path::Path) -> EnvironmentType {
-        EnvironmentType::detect(cwd, &[
-            "**/prod/**".to_string(),
-            "**/production/**".to_string(),
-        ])
+        EnvironmentType::detect(
+            cwd,
+            &["**/prod/**".to_string(), "**/production/**".to_string()],
+        )
     }
 }
 
 impl Default for EnvPlugin {
-    fn default() -> Self { Self::new() }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 #[async_trait]
 impl Plugin for EnvPlugin {
-    fn manifest(&self) -> &PluginManifest { &self.manifest }
-    async fn init(&mut self, _ctx: &PluginContext) -> Result<(), PluginError> { Ok(()) }
-    fn should_activate(&self, _ctx: &DetectionContext) -> bool { true }
+    fn manifest(&self) -> &PluginManifest {
+        &self.manifest
+    }
+    async fn init(&mut self, _ctx: &PluginContext) -> Result<(), PluginError> {
+        Ok(())
+    }
+    fn should_activate(&self, _ctx: &DetectionContext) -> bool {
+        true
+    }
 
-    async fn segments(&self, ctx: &masterm_core::plugin::PromptContext) -> Result<Vec<Segment>, PluginError> {
+    async fn segments(
+        &self,
+        ctx: &masterm_core::plugin::PromptContext,
+    ) -> Result<Vec<Segment>, PluginError> {
         let env_type = self.detect_env(&ctx.cwd);
 
         match env_type {
-            EnvironmentType::Production => {
-                Ok(vec![Segment::new("env", "PROD")
-                    .with_style(SegmentStyle {
-                        fg: Some(Color::Named(NamedColor::White)),
-                        bg: Some(Color::Named(NamedColor::Red)),
-                        bold: true,
-                        icon: Some("⚠".to_string()),
-                        ..Default::default()
-                    })
-                    .with_priority(0)])
-            }
-            EnvironmentType::Staging => {
-                Ok(vec![Segment::new("env", "STAGING")
-                    .with_style(SegmentStyle {
-                        fg: Some(Color::Named(NamedColor::Black)),
-                        bg: Some(Color::Named(NamedColor::Yellow)),
-                        bold: true,
-                        ..Default::default()
-                    })
-                    .with_priority(1)])
-            }
+            EnvironmentType::Production => Ok(vec![Segment::new("env", "PROD")
+                .with_style(SegmentStyle {
+                    fg: Some(Color::Named(NamedColor::White)),
+                    bg: Some(Color::Named(NamedColor::Red)),
+                    bold: true,
+                    icon: Some("⚠".to_string()),
+                    ..Default::default()
+                })
+                .with_priority(0)]),
+            EnvironmentType::Staging => Ok(vec![Segment::new("env", "STAGING")
+                .with_style(SegmentStyle {
+                    fg: Some(Color::Named(NamedColor::Black)),
+                    bg: Some(Color::Named(NamedColor::Yellow)),
+                    bold: true,
+                    ..Default::default()
+                })
+                .with_priority(1)]),
             _ => Ok(vec![]),
         }
     }
 
-    fn on_command(&self, _cmd: &str) -> CommandAction { CommandAction::Allow }
-    async fn cleanup(&mut self) -> Result<(), PluginError> { Ok(()) }
+    fn on_command(&self, _cmd: &str) -> CommandAction {
+        CommandAction::Allow
+    }
+    async fn cleanup(&mut self) -> Result<(), PluginError> {
+        Ok(())
+    }
 }

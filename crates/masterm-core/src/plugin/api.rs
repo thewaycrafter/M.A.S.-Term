@@ -1,9 +1,9 @@
 //! Plugin API trait and types
 
 use super::PluginManifest;
-use std::path::PathBuf;
 use crate::prompt::Segment;
 use async_trait::async_trait;
+use std::path::PathBuf;
 
 use std::collections::HashMap;
 use thiserror::Error;
@@ -59,7 +59,9 @@ impl PluginContext {
 
     /// Get a config value as string
     pub fn get_config_string(&self, key: &str) -> Option<String> {
-        self.config.get(key).and_then(|v| v.as_str().map(|s| s.to_string()))
+        self.config
+            .get(key)
+            .and_then(|v| v.as_str().map(|s| s.to_string()))
     }
 
     /// Get a config value as bool
@@ -70,13 +72,15 @@ impl PluginContext {
     /// Get a config value as string list
     pub fn get_string_list(&self, key: &str) -> Result<Vec<String>, PluginError> {
         match self.config.get(key) {
-            Some(toml::Value::Array(arr)) => {
-                Ok(arr.iter()
-                    .filter_map(|v| v.as_str().map(String::from))
-                    .collect())
-            }
+            Some(toml::Value::Array(arr)) => Ok(arr
+                .iter()
+                .filter_map(|v| v.as_str().map(String::from))
+                .collect()),
             None => Ok(Vec::new()),
-            _ => Err(PluginError::ConfigError(format!("{} is not a string list", key))),
+            _ => Err(PluginError::ConfigError(format!(
+                "{} is not a string list",
+                key
+            ))),
         }
     }
 

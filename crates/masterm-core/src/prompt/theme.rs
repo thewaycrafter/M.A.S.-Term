@@ -178,14 +178,14 @@ impl Theme {
             name: "catppuccin".to_string(),
             directory: Color::from_hex("#89b4fa").unwrap(), // Blue
             git_branch: Color::from_hex("#cba6f7").unwrap(), // Mauve
-            git_clean: Color::from_hex("#a6e3a1").unwrap(),  // Green
-            git_dirty: Color::from_hex("#f38ba8").unwrap(),  // Red
-            error: Color::from_hex("#f38ba8").unwrap(),      // Red
-            success: Color::from_hex("#a6e3a1").unwrap(),    // Green
-            warning: Color::from_hex("#f9e2af").unwrap(),    // Yellow
-            prod: Color::from_hex("#f38ba8").unwrap(),       // Red
-            staging: Color::from_hex("#f9e2af").unwrap(),    // Yellow
-            duration: Color::from_hex("#f5c2e7").unwrap(),   // Pink
+            git_clean: Color::from_hex("#a6e3a1").unwrap(), // Green
+            git_dirty: Color::from_hex("#f38ba8").unwrap(), // Red
+            error: Color::from_hex("#f38ba8").unwrap(),     // Red
+            success: Color::from_hex("#a6e3a1").unwrap(),   // Green
+            warning: Color::from_hex("#f9e2af").unwrap(),   // Yellow
+            prod: Color::from_hex("#f38ba8").unwrap(),      // Red
+            staging: Color::from_hex("#f9e2af").unwrap(),   // Yellow
+            duration: Color::from_hex("#f5c2e7").unwrap(),  // Pink
         }
     }
 
@@ -195,14 +195,14 @@ impl Theme {
             name: "dracula".to_string(),
             directory: Color::from_hex("#bd93f9").unwrap(), // Purple
             git_branch: Color::from_hex("#ff79c6").unwrap(), // Pink
-            git_clean: Color::from_hex("#50fa7b").unwrap(),  // Green
-            git_dirty: Color::from_hex("#ff5555").unwrap(),  // Red
+            git_clean: Color::from_hex("#50fa7b").unwrap(), // Green
+            git_dirty: Color::from_hex("#ff5555").unwrap(), // Red
             error: Color::from_hex("#ff5555").unwrap(),
             success: Color::from_hex("#50fa7b").unwrap(),
-            warning: Color::from_hex("#f1fa8c").unwrap(),    // Yellow
+            warning: Color::from_hex("#f1fa8c").unwrap(), // Yellow
             prod: Color::from_hex("#ff5555").unwrap(),
             staging: Color::from_hex("#f1fa8c").unwrap(),
-            duration: Color::from_hex("#8be9fd").unwrap(),   // Cyan
+            duration: Color::from_hex("#8be9fd").unwrap(), // Cyan
         }
     }
 
@@ -212,14 +212,14 @@ impl Theme {
             name: "nord".to_string(),
             directory: Color::from_hex("#81a1c1").unwrap(), // Frost
             git_branch: Color::from_hex("#b48ead").unwrap(), // Aurora purple
-            git_clean: Color::from_hex("#a3be8c").unwrap(),  // Aurora green
-            git_dirty: Color::from_hex("#bf616a").unwrap(),  // Aurora red
+            git_clean: Color::from_hex("#a3be8c").unwrap(), // Aurora green
+            git_dirty: Color::from_hex("#bf616a").unwrap(), // Aurora red
             error: Color::from_hex("#bf616a").unwrap(),
             success: Color::from_hex("#a3be8c").unwrap(),
-            warning: Color::from_hex("#ebcb8b").unwrap(),    // Aurora yellow
+            warning: Color::from_hex("#ebcb8b").unwrap(), // Aurora yellow
             prod: Color::from_hex("#bf616a").unwrap(),
             staging: Color::from_hex("#ebcb8b").unwrap(),
-            duration: Color::from_hex("#88c0d0").unwrap(),   // Frost
+            duration: Color::from_hex("#88c0d0").unwrap(), // Frost
         }
     }
 

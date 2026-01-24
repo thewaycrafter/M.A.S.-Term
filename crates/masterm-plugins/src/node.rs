@@ -2,11 +2,11 @@
 
 use async_trait::async_trait;
 use masterm_core::plugin::{
-    Plugin, PluginContext, PluginError, PluginManifest, PluginMeta,
-    PluginRequirements, PluginPermissions, PluginActivation, PluginPerformance,
-    DetectionContext, CommandAction, ActivationTrigger,
+    ActivationTrigger, CommandAction, DetectionContext, Plugin, PluginActivation, PluginContext,
+    PluginError, PluginManifest, PluginMeta, PluginPerformance, PluginPermissions,
+    PluginRequirements,
 };
-use masterm_core::prompt::{Segment, SegmentStyle, Color, NamedColor};
+use masterm_core::prompt::{Color, NamedColor, Segment, SegmentStyle};
 use std::process::Command;
 
 pub struct NodePlugin {
@@ -35,9 +35,9 @@ impl NodePlugin {
                     ..Default::default()
                 },
                 activation: PluginActivation {
-                    triggers: vec![
-                        ActivationTrigger::FileExists { pattern: "package.json".to_string() },
-                    ],
+                    triggers: vec![ActivationTrigger::FileExists {
+                        pattern: "package.json".to_string(),
+                    }],
                     mode: "auto".to_string(),
                 },
                 performance: PluginPerformance {
@@ -54,19 +54,37 @@ impl NodePlugin {
             .output()
             .ok()
             .filter(|o| o.status.success())
-            .map(|o| String::from_utf8_lossy(&o.stdout).trim().trim_start_matches('v').to_string())
+            .map(|o| {
+                String::from_utf8_lossy(&o.stdout)
+                    .trim()
+                    .trim_start_matches('v')
+                    .to_string()
+            })
     }
 }
 
-impl Default for NodePlugin { fn default() -> Self { Self::new() } }
+impl Default for NodePlugin {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 #[async_trait]
 impl Plugin for NodePlugin {
-    fn manifest(&self) -> &PluginManifest { &self.manifest }
-    async fn init(&mut self, _ctx: &PluginContext) -> Result<(), PluginError> { Ok(()) }
-    fn should_activate(&self, ctx: &DetectionContext) -> bool { ctx.cwd.join("package.json").exists() }
+    fn manifest(&self) -> &PluginManifest {
+        &self.manifest
+    }
+    async fn init(&mut self, _ctx: &PluginContext) -> Result<(), PluginError> {
+        Ok(())
+    }
+    fn should_activate(&self, ctx: &DetectionContext) -> bool {
+        ctx.cwd.join("package.json").exists()
+    }
 
-    async fn segments(&self, _ctx: &masterm_core::plugin::PromptContext) -> Result<Vec<Segment>, PluginError> {
+    async fn segments(
+        &self,
+        _ctx: &masterm_core::plugin::PromptContext,
+    ) -> Result<Vec<Segment>, PluginError> {
         if let Some(version) = self.get_version() {
             Ok(vec![Segment::new("node", format!("v{}", version))
                 .with_style(SegmentStyle {
@@ -76,9 +94,15 @@ impl Plugin for NodePlugin {
                     ..Default::default()
                 })
                 .with_priority(100)])
-        } else { Ok(vec![]) }
+        } else {
+            Ok(vec![])
+        }
     }
 
-    fn on_command(&self, _cmd: &str) -> CommandAction { CommandAction::Allow }
-    async fn cleanup(&mut self) -> Result<(), PluginError> { Ok(()) }
+    fn on_command(&self, _cmd: &str) -> CommandAction {
+        CommandAction::Allow
+    }
+    async fn cleanup(&mut self) -> Result<(), PluginError> {
+        Ok(())
+    }
 }

@@ -3,10 +3,10 @@
 use super::output;
 use anyhow::Result;
 use clap::Args;
+use comfy_table::{presets::UTF8_FULL, Cell, Color, ContentArrangement, Table};
 use console::style;
+use masterm_core::config::{ColorCapability, ConfigLoader, ShellType};
 use std::process::Command;
-use masterm_core::config::{ConfigLoader, ShellType, ColorCapability};
-use comfy_table::{Table, presets::UTF8_FULL, ContentArrangement, Cell, Color};
 
 /// Doctor command arguments
 #[derive(Args)]
@@ -26,7 +26,7 @@ pub async fn run(_args: DoctorArgs) -> Result<()> {
 
     // System Information
     println!("\n{}", style("System Information").bold());
-    
+
     let mut sys_table = Table::new();
     sys_table
         .load_preset(UTF8_FULL)
@@ -61,16 +61,16 @@ pub async fn run(_args: DoctorArgs) -> Result<()> {
 
     // Note: table doesn't support owo_colors directly in str, using Cell styling
     sys_table.add_row(vec![
-        Cell::new("Fonts"), 
-        if has_nerd_font { 
-            Cell::new("Nerd Fonts detected").fg(Color::Green) 
-        } else { 
-            Cell::new("Nerd Fonts not detected (Fallback)").fg(Color::Yellow) 
-        }
+        Cell::new("Fonts"),
+        if has_nerd_font {
+            Cell::new("Nerd Fonts detected").fg(Color::Green)
+        } else {
+            Cell::new("Nerd Fonts not detected (Fallback)").fg(Color::Yellow)
+        },
     ]);
 
     println!("{sys_table}");
-    
+
     if !has_nerd_font {
         warnings += 1;
     }
@@ -117,14 +117,8 @@ pub async fn run(_args: DoctorArgs) -> Result<()> {
 
     // Shell integration
     let (rc_path, init_marker) = match shell {
-        ShellType::Zsh => (
-            dirs::home_dir().map(|h| h.join(".zshrc")),
-            "masterm init",
-        ),
-        ShellType::Bash => (
-            dirs::home_dir().map(|h| h.join(".bashrc")),
-            "masterm init",
-        ),
+        ShellType::Zsh => (dirs::home_dir().map(|h| h.join(".zshrc")), "masterm init"),
+        ShellType::Bash => (dirs::home_dir().map(|h| h.join(".bashrc")), "masterm init"),
         ShellType::Fish => (
             dirs::home_dir().map(|h| h.join(".config/fish/config.fish")),
             "masterm init",
@@ -136,9 +130,17 @@ pub async fn run(_args: DoctorArgs) -> Result<()> {
         if rc.exists() {
             let content = std::fs::read_to_string(&rc).unwrap_or_default();
             if content.contains(init_marker) {
-                println!("  {} Shell integration in {}", output::SUCCESS, rc.display());
+                println!(
+                    "  {} Shell integration in {}",
+                    output::SUCCESS,
+                    rc.display()
+                );
             } else {
-                println!("  {} Shell integration missing from {}", output::WARNING, rc.display());
+                println!(
+                    "  {} Shell integration missing from {}",
+                    output::WARNING,
+                    rc.display()
+                );
                 warnings += 1;
             }
         }
@@ -173,13 +175,25 @@ pub async fn run(_args: DoctorArgs) -> Result<()> {
     let prompt_time = start.elapsed();
 
     let prompt_status = if prompt_time.as_millis() < 30 {
-        format!("{} {}ms (target: <30ms)", output::SUCCESS, prompt_time.as_millis())
+        format!(
+            "{} {}ms (target: <30ms)",
+            output::SUCCESS,
+            prompt_time.as_millis()
+        )
     } else if prompt_time.as_millis() < 50 {
         warnings += 1;
-        format!("{} {}ms (target: <30ms)", output::WARNING, prompt_time.as_millis())
+        format!(
+            "{} {}ms (target: <30ms)",
+            output::WARNING,
+            prompt_time.as_millis()
+        )
     } else {
         errors += 1;
-        format!("{} {}ms (target: <30ms)", output::FAILURE, prompt_time.as_millis())
+        format!(
+            "{} {}ms (target: <30ms)",
+            output::FAILURE,
+            prompt_time.as_millis()
+        )
     };
     println!("  Prompt time: {}", prompt_status);
 

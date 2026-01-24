@@ -2,13 +2,13 @@
 
 use anyhow::Result;
 use clap::Args;
-use std::path::PathBuf;
-use std::time::Duration;
 use masterm_core::{
     config::{ConfigLoader, ShellType},
     context::ContextDetector,
     prompt::PromptRenderer,
 };
+use std::path::PathBuf;
+use std::time::Duration;
 
 /// Prompt command arguments
 #[derive(Args)]
@@ -33,15 +33,17 @@ pub struct PromptArgs {
 /// Run the prompt command
 pub async fn run(args: PromptArgs) -> Result<()> {
     // Get CWD
-    let cwd = args.cwd.unwrap_or_else(|| std::env::current_dir().unwrap_or_default());
+    let cwd = args
+        .cwd
+        .unwrap_or_else(|| std::env::current_dir().unwrap_or_default());
 
     // Load configuration
     let loader = ConfigLoader::new();
     let config = loader.load(&cwd)?;
 
     // Detect context
-    let mut detector = ContextDetector::new()
-        .with_prod_patterns(config.safety.prod_patterns.clone());
+    let mut detector =
+        ContextDetector::new().with_prod_patterns(config.safety.prod_patterns.clone());
 
     let context = detector.detect(&cwd).await?;
 

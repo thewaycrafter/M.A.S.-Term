@@ -3,9 +3,9 @@
 use super::output;
 use anyhow::Result;
 use clap::Subcommand;
+use comfy_table::{presets::UTF8_HORIZONTAL_ONLY, Cell, Color, ContentArrangement, Table};
 use console::style;
 use masterm_core::plugin::PluginLoader;
-use comfy_table::{Table, presets::UTF8_HORIZONTAL_ONLY, ContentArrangement, Cell, Color};
 
 /// Plugins subcommands
 #[derive(Subcommand)]
@@ -107,7 +107,9 @@ async fn list_plugins(show_status: bool) -> Result<()> {
         };
 
         table.add_row(vec![
-            Cell::new(name).fg(Color::Cyan).add_attribute(comfy_table::Attribute::Bold),
+            Cell::new(name)
+                .fg(Color::Cyan)
+                .add_attribute(comfy_table::Attribute::Bold),
             Cell::new(format!("v{}", version)),
             status_cell,
             Cell::new(desc),
@@ -119,7 +121,9 @@ async fn list_plugins(show_status: bool) -> Result<()> {
         let status_cell = Cell::new("Active").fg(Color::Green); // External plugins found are active by default for now
 
         table.add_row(vec![
-            Cell::new(&manifest.plugin.name).fg(Color::Cyan).add_attribute(comfy_table::Attribute::Bold),
+            Cell::new(&manifest.plugin.name)
+                .fg(Color::Cyan)
+                .add_attribute(comfy_table::Attribute::Bold),
             Cell::new(format!("v{}", manifest.plugin.version)),
             status_cell,
             Cell::new(&manifest.plugin.description),
@@ -129,7 +133,10 @@ async fn list_plugins(show_status: bool) -> Result<()> {
     println!("{table}");
 
     if !show_status {
-        println!("\n{}", style("Tip: Use --status for more details (coming soon in v1.2)").dim());
+        println!(
+            "\n{}",
+            style("Tip: Use --status for more details (coming soon in v1.2)").dim()
+        );
     }
 
     Ok(())
@@ -157,7 +164,9 @@ async fn search_plugins(query: &str) -> Result<()> {
     for (name, desc, ver) in registry {
         if name.contains(query) || desc.to_lowercase().contains(&query.to_lowercase()) {
             table.add_row(vec![
-                Cell::new(name).fg(Color::Cyan).add_attribute(comfy_table::Attribute::Bold),
+                Cell::new(name)
+                    .fg(Color::Cyan)
+                    .add_attribute(comfy_table::Attribute::Bold),
                 Cell::new(ver),
                 Cell::new(desc),
             ]);
@@ -167,7 +176,10 @@ async fn search_plugins(query: &str) -> Result<()> {
 
     if found {
         println!("\n{table}");
-        println!("\nTo install: {} install <name>", style("masterm plugins").bold());
+        println!(
+            "\nTo install: {} install <name>",
+            style("masterm plugins").bold()
+        );
     } else {
         println!("\nNo plugins found matching '{}'", query);
     }
@@ -181,7 +193,7 @@ async fn install_plugin(plugin: &str) -> Result<()> {
 
     // Simple simulation for now
     let known_plugins = ["docker-context", "aws-profile", "kubectl-ns"];
-    
+
     if !known_plugins.contains(&plugin) {
         output::error(&format!("Plugin '{}' not found in registry", plugin));
         return Ok(());
@@ -191,16 +203,17 @@ async fn install_plugin(plugin: &str) -> Result<()> {
         .unwrap_or_default()
         .join(".masterm/plugins")
         .join(plugin);
-        
+
     if plugin_dir.exists() {
         output::warning(&format!("Plugin '{}' is already installed", plugin));
         return Ok(());
     }
 
     std::fs::create_dir_all(&plugin_dir)?;
-    
+
     // Create dummy manifest
-    let manifest = format!(r#"
+    let manifest = format!(
+        r#"
 [plugin]
 name = "{}"
 version = "1.0.0"
@@ -214,7 +227,9 @@ binaries = []
 [permissions]
 filesystem = []
 network = "none"
-"#, plugin, plugin);
+"#,
+        plugin, plugin
+    );
 
     std::fs::write(plugin_dir.join("plugin.toml"), manifest)?;
     std::fs::write(plugin_dir.join(format!("{}.wasm", plugin)), "")?; // Empty placeholder WASM

@@ -38,7 +38,10 @@ impl EnvironmentType {
         }
 
         // Check common patterns
-        if path_str.contains("/prod") || path_str.contains("/production") || path_str.contains("/prd-") {
+        if path_str.contains("/prod")
+            || path_str.contains("/production")
+            || path_str.contains("/prd-")
+        {
             return Self::Production;
         }
 
@@ -46,7 +49,10 @@ impl EnvironmentType {
             return Self::Staging;
         }
 
-        if path_str.contains("/dev") || path_str.contains("/development") || path_str.contains("/local") {
+        if path_str.contains("/dev")
+            || path_str.contains("/development")
+            || path_str.contains("/local")
+        {
             return Self::Development;
         }
 
@@ -64,7 +70,14 @@ impl EnvironmentType {
     /// Check environment variables for hints
     fn from_env_vars() -> Option<Self> {
         // Check common environment variables
-        let env_vars = ["TERMX_ENV", "NODE_ENV", "RAILS_ENV", "RACK_ENV", "GO_ENV", "APP_ENV"];
+        let env_vars = [
+            "TERMX_ENV",
+            "NODE_ENV",
+            "RAILS_ENV",
+            "RACK_ENV",
+            "GO_ENV",
+            "APP_ENV",
+        ];
 
         for var in env_vars {
             if let Ok(value) = std::env::var(var) {
@@ -161,10 +174,22 @@ mod tests {
 
     #[test]
     fn test_from_str() {
-        assert_eq!(EnvironmentType::parse_from_str("production"), Some(EnvironmentType::Production));
-        assert_eq!(EnvironmentType::parse_from_str("prod"), Some(EnvironmentType::Production));
-        assert_eq!(EnvironmentType::parse_from_str("staging"), Some(EnvironmentType::Staging));
-        assert_eq!(EnvironmentType::parse_from_str("dev"), Some(EnvironmentType::Development));
+        assert_eq!(
+            EnvironmentType::parse_from_str("production"),
+            Some(EnvironmentType::Production)
+        );
+        assert_eq!(
+            EnvironmentType::parse_from_str("prod"),
+            Some(EnvironmentType::Production)
+        );
+        assert_eq!(
+            EnvironmentType::parse_from_str("staging"),
+            Some(EnvironmentType::Staging)
+        );
+        assert_eq!(
+            EnvironmentType::parse_from_str("dev"),
+            Some(EnvironmentType::Development)
+        );
         assert_eq!(EnvironmentType::parse_from_str("unknown"), None);
     }
 

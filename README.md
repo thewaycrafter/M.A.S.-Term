@@ -13,6 +13,7 @@
 </h4>
 
 <p align="center">
+  <a href="DOCUMENTATION.md"><strong>📚 Documentation</strong></a> •
   <a href="#-quick-start">Quick Start</a> •
   <a href="#-features">Features</a> •
   <a href="#-installation">Installation</a> •

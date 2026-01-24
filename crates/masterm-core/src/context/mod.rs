@@ -6,14 +6,14 @@
 //! - Container environments
 //! - Environment type (dev/staging/prod)
 
+mod container;
 mod detector;
+mod environment;
 mod git;
 mod language;
-mod container;
-mod environment;
 
+pub use container::ContainerContext;
 pub use detector::{Context, ContextDetector};
 pub use environment::EnvironmentType;
 pub use git::GitContext;
 pub use language::LanguageContext;
-pub use container::ContainerContext;

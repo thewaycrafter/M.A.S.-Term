@@ -17,7 +17,7 @@ impl WasmPlugin {
         let engine = Engine::default();
         let module = Module::from_file(&engine, path)?;
         let store = Arc::new(Mutex::new(Store::new(&engine, ())));
-        
+
         Ok(Self {
             engine,
             module,
@@ -30,16 +30,17 @@ impl WasmPlugin {
         let mut store = self.store.lock().unwrap();
         let linker = Linker::new(&self.engine);
         let instance = linker.instantiate(&mut *store, &self.module)?;
-        
+
         // Simple interface: plugins export a function that returns an offset/length ptr
         // Real implementation would use WASI or a more complex bindgen
         // For now, we'll try to call a simple function returning an integer status
-        
-        let func = instance.get_typed_func::<(), i32>(&mut *store, func_name)
+
+        let func = instance
+            .get_typed_func::<(), i32>(&mut *store, func_name)
             .context("Function not found or signature mismatch")?;
-            
+
         let result = func.call(&mut *store, ())?;
-        
+
         Ok(result.to_string())
     }
 }

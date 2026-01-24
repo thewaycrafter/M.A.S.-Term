@@ -2,11 +2,11 @@
 
 use async_trait::async_trait;
 use masterm_core::plugin::{
-    Plugin, PluginContext, PluginError, PluginManifest, PluginMeta,
-    PluginRequirements, PluginPermissions, PluginActivation, PluginPerformance,
-    DetectionContext, CommandAction, ActivationTrigger,
+    ActivationTrigger, CommandAction, DetectionContext, Plugin, PluginActivation, PluginContext,
+    PluginError, PluginManifest, PluginMeta, PluginPerformance, PluginPermissions,
+    PluginRequirements,
 };
-use masterm_core::prompt::{Segment, SegmentStyle, Color, NamedColor};
+use masterm_core::prompt::{Color, NamedColor, Segment, SegmentStyle};
 use std::process::Command;
 
 pub struct PythonPlugin {
@@ -34,8 +34,12 @@ impl PythonPlugin {
                 },
                 activation: PluginActivation {
                     triggers: vec![
-                        ActivationTrigger::FileExists { pattern: "pyproject.toml".to_string() },
-                        ActivationTrigger::FileExists { pattern: "requirements.txt".to_string() },
+                        ActivationTrigger::FileExists {
+                            pattern: "pyproject.toml".to_string(),
+                        },
+                        ActivationTrigger::FileExists {
+                            pattern: "requirements.txt".to_string(),
+                        },
                     ],
                     mode: "auto".to_string(),
                 },
@@ -59,50 +63,71 @@ impl PythonPlugin {
 
     fn get_venv(&self) -> Option<String> {
         std::env::var("VIRTUAL_ENV").ok().and_then(|p| {
-            std::path::Path::new(&p).file_name().map(|n| n.to_string_lossy().to_string())
+            std::path::Path::new(&p)
+                .file_name()
+                .map(|n| n.to_string_lossy().to_string())
         })
     }
 }
 
-impl Default for PythonPlugin { fn default() -> Self { Self::new() } }
+impl Default for PythonPlugin {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 #[async_trait]
 impl Plugin for PythonPlugin {
-    fn manifest(&self) -> &PluginManifest { &self.manifest }
-    async fn init(&mut self, _ctx: &PluginContext) -> Result<(), PluginError> { Ok(()) }
-
-    fn should_activate(&self, ctx: &DetectionContext) -> bool {
-        ctx.cwd.join("pyproject.toml").exists() ||
-        ctx.cwd.join("requirements.txt").exists() ||
-        ctx.cwd.join("setup.py").exists() ||
-        std::env::var("VIRTUAL_ENV").is_ok()
+    fn manifest(&self) -> &PluginManifest {
+        &self.manifest
+    }
+    async fn init(&mut self, _ctx: &PluginContext) -> Result<(), PluginError> {
+        Ok(())
     }
 
-    async fn segments(&self, _ctx: &masterm_core::plugin::PromptContext) -> Result<Vec<Segment>, PluginError> {
+    fn should_activate(&self, ctx: &DetectionContext) -> bool {
+        ctx.cwd.join("pyproject.toml").exists()
+            || ctx.cwd.join("requirements.txt").exists()
+            || ctx.cwd.join("setup.py").exists()
+            || std::env::var("VIRTUAL_ENV").is_ok()
+    }
+
+    async fn segments(
+        &self,
+        _ctx: &masterm_core::plugin::PromptContext,
+    ) -> Result<Vec<Segment>, PluginError> {
         let mut segs = Vec::new();
 
         if let Some(venv) = self.get_venv() {
-            segs.push(Segment::new("python_venv", format!("({})", venv))
-                .with_style(SegmentStyle {
-                    fg: Some(Color::Named(NamedColor::Yellow)),
-                    icon: Some("".to_string()),
-                    icon_fallback: Some("🐍".to_string()),
-                    ..Default::default()
-                })
-                .with_priority(95));
+            segs.push(
+                Segment::new("python_venv", format!("({})", venv))
+                    .with_style(SegmentStyle {
+                        fg: Some(Color::Named(NamedColor::Yellow)),
+                        icon: Some("".to_string()),
+                        icon_fallback: Some("🐍".to_string()),
+                        ..Default::default()
+                    })
+                    .with_priority(95),
+            );
         } else if let Some(version) = self.get_version() {
-            segs.push(Segment::new("python", format!("v{}", version))
-                .with_style(SegmentStyle {
-                    fg: Some(Color::Named(NamedColor::Yellow)),
-                    icon: Some("".to_string()),
-                    ..Default::default()
-                })
-                .with_priority(100));
+            segs.push(
+                Segment::new("python", format!("v{}", version))
+                    .with_style(SegmentStyle {
+                        fg: Some(Color::Named(NamedColor::Yellow)),
+                        icon: Some("".to_string()),
+                        ..Default::default()
+                    })
+                    .with_priority(100),
+            );
         }
 
         Ok(segs)
     }
 
-    fn on_command(&self, _cmd: &str) -> CommandAction { CommandAction::Allow }
-    async fn cleanup(&mut self) -> Result<(), PluginError> { Ok(()) }
+    fn on_command(&self, _cmd: &str) -> CommandAction {
+        CommandAction::Allow
+    }
+    async fn cleanup(&mut self) -> Result<(), PluginError> {
+        Ok(())
+    }
 }

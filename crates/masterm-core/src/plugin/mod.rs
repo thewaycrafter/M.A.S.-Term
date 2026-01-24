@@ -6,13 +6,13 @@
 //! - Lazy loading
 //! - Lifecycle management
 
-mod loader;
 mod api;
+mod loader;
 mod permissions;
 pub mod wasm;
 
-pub use api::{Plugin, PluginContext, PluginError, CommandAction, DetectionContext};
 pub use api::PromptContext;
+pub use api::{CommandAction, DetectionContext, Plugin, PluginContext, PluginError};
 pub use loader::{PluginLoader, PluginManager};
 pub use permissions::{Permission, PermissionSet};
 

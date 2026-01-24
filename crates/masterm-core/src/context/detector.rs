@@ -46,10 +46,7 @@ impl ContextDetector {
         Self {
             cache: std::collections::HashMap::new(),
             cache_ttl: Duration::from_secs(5),
-            prod_patterns: vec![
-                "**/prod/**".to_string(),
-                "**/production/**".to_string(),
-            ],
+            prod_patterns: vec!["**/prod/**".to_string(), "**/production/**".to_string()],
         }
     }
 
