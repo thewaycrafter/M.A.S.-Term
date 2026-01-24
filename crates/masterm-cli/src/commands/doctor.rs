@@ -16,7 +16,7 @@ pub struct DoctorArgs {
 }
 
 /// Run the doctor command
-pub async fn run(args: DoctorArgs) -> Result<()> {
+pub async fn run(_args: DoctorArgs) -> Result<()> {
     println!("{}", style("MASTerm Doctor").bold());
     println!("{}", "═".repeat(60));
 

@@ -1,10 +1,9 @@
 //! Profile command for performance analysis
 
-use super::output;
+use std::time::Instant;
 use anyhow::Result;
 use clap::Subcommand;
 use console::style;
-use std::time::Instant;
 
 /// Profile subcommands
 #[derive(Subcommand)]

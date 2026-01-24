@@ -68,7 +68,7 @@ impl EnvironmentType {
 
         for var in env_vars {
             if let Ok(value) = std::env::var(var) {
-                if let Some(env_type) = Self::from_str(&value) {
+                if let Some(env_type) = Self::parse_from_str(&value) {
                     return Some(env_type);
                 }
             }
@@ -77,8 +77,8 @@ impl EnvironmentType {
         None
     }
 
-    /// Parse from string
-    pub fn from_str(s: &str) -> Option<Self> {
+    /// Parse from string (not FromStr trait)
+    pub fn parse_from_str(s: &str) -> Option<Self> {
         match s.to_lowercase().as_str() {
             "production" | "prod" | "prd" => Some(Self::Production),
             "staging" | "stage" | "stg" | "uat" | "preprod" => Some(Self::Staging),
@@ -161,11 +161,11 @@ mod tests {
 
     #[test]
     fn test_from_str() {
-        assert_eq!(EnvironmentType::from_str("production"), Some(EnvironmentType::Production));
-        assert_eq!(EnvironmentType::from_str("prod"), Some(EnvironmentType::Production));
-        assert_eq!(EnvironmentType::from_str("staging"), Some(EnvironmentType::Staging));
-        assert_eq!(EnvironmentType::from_str("dev"), Some(EnvironmentType::Development));
-        assert_eq!(EnvironmentType::from_str("unknown"), None);
+        assert_eq!(EnvironmentType::parse_from_str("production"), Some(EnvironmentType::Production));
+        assert_eq!(EnvironmentType::parse_from_str("prod"), Some(EnvironmentType::Production));
+        assert_eq!(EnvironmentType::parse_from_str("staging"), Some(EnvironmentType::Staging));
+        assert_eq!(EnvironmentType::parse_from_str("dev"), Some(EnvironmentType::Development));
+        assert_eq!(EnvironmentType::parse_from_str("unknown"), None);
     }
 
     #[test]

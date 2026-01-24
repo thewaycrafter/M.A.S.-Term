@@ -1,10 +1,10 @@
 //! Install and uninstall commands
 
 use super::output;
-use anyhow::{Context, Result};
+use anyhow::Result;
 use clap::Args;
 use console::style;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use masterm_core::config::ShellType;
 
 /// Install command arguments
@@ -116,7 +116,7 @@ fn get_masterm_dir() -> Result<PathBuf> {
 }
 
 /// Install shell integration scripts
-fn install_shell_integration(shell: ShellType, masterm_dir: &PathBuf) -> Result<()> {
+fn install_shell_integration(shell: ShellType, masterm_dir: &Path) -> Result<()> {
     let shell_dir = masterm_dir.join("shell");
     std::fs::create_dir_all(&shell_dir)?;
 

@@ -19,6 +19,7 @@ struct FilterRule {
     action: CommandAction,
 
     /// Rule description
+    #[allow(dead_code)]
     description: String,
 }
 

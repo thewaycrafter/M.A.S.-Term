@@ -33,10 +33,10 @@ pub struct PromptRenderer {
     icon_mode: IconMode,
 
     /// Terminal color capability
-    color_capability: ColorCapability,
+    _color_capability: ColorCapability,
 
     /// Terminal width
-    terminal_width: u16,
+    _terminal_width: u16,
 }
 
 impl PromptRenderer {
@@ -51,8 +51,8 @@ impl PromptRenderer {
             config,
             theme,
             icon_mode,
-            color_capability,
-            terminal_width,
+            _color_capability: color_capability,
+            _terminal_width: terminal_width,
         }
     }
 
@@ -79,6 +79,7 @@ impl PromptRenderer {
         let continuation = self.render_continuation();
 
         // Build transient prompt if enabled
+
         let transient = if self.config.transient {
             Some(self.render_transient())
         } else {
@@ -147,7 +148,7 @@ impl PromptRenderer {
         // Git segments (if in git repo)
         if let Some(ref git) = context.git {
             // Branch
-            let branch_icon = if git.detached { "" } else { "" };
+            let branch_icon = "";
             segments.push(
                 Segment::new("git_branch", &git.branch)
                     .with_style(SegmentStyle::new()
@@ -305,12 +306,13 @@ impl PromptRenderer {
             "none" => IconMode::None,
             _ => {
                 // Auto-detect: check for Nerd Fonts hint
+                #[allow(clippy::if_same_then_else)]
                 if std::env::var("TERMX_ICONS").map(|v| v == "nerd").unwrap_or(false) {
                     IconMode::Nerd
                 } else if std::env::var("TERM_PROGRAM").map(|t| t.contains("iTerm") || t.contains("Alacritty")).unwrap_or(false) {
                     IconMode::Nerd // Assume modern terminals have Nerd Fonts
                 } else {
-                    IconMode::Unicode
+                    IconMode::Auto // Fallback
                 }
             }
         }

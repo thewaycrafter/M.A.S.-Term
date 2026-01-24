@@ -1,13 +1,13 @@
 //! Plugin loader and manager
 
-use super::{Plugin, PluginContext, PluginError, PluginManifest, DetectionContext, ActivationTrigger};
+use super::{Plugin, PluginContext, PluginManifest, DetectionContext, ActivationTrigger};
 use crate::prompt::Segment;
 use anyhow::Result;
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use tokio::sync::RwLock;
-use tracing::{debug, info, warn};
+use tracing::{debug, warn};
 
 /// Plugin loader for discovering and loading plugins
 pub struct PluginLoader {
@@ -207,7 +207,7 @@ impl Default for PluginManager {
 }
 
 /// Check if a trigger matches the detection context
-pub fn trigger_matches(trigger: &ActivationTrigger, ctx: &DetectionContext) -> bool {
+pub fn _trigger_matches(trigger: &ActivationTrigger, ctx: &DetectionContext) -> bool {
     match trigger {
         ActivationTrigger::FileExists { pattern } => {
             ctx.cwd.join(pattern).exists() || ctx.has_file_matching(pattern)

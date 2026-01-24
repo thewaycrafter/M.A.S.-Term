@@ -179,6 +179,7 @@ impl SegmentStyle {
 }
 
 /// Built-in segment types
+#[allow(dead_code)]
 pub enum BuiltinSegment {
     /// Current directory
     Directory,

@@ -119,9 +119,9 @@ impl SafetyGuard for ProdGuard {
                 return CommandAction::Confirm(self.confirmation_message(command));
             }
             // In staging: just warn
-            return CommandAction::Warn(format!(
-                "\x1b[33m⚠️  Warning: This command may be dangerous in staging.\x1b[0m"
-            ));
+            return CommandAction::Warn(
+                "\x1b[33m⚠️  Warning: This command may be dangerous in staging.\x1b[0m".to_string()
+            );
         }
 
         CommandAction::Allow

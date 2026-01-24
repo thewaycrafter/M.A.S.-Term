@@ -57,12 +57,13 @@ impl std::fmt::Display for ShellType {
 }
 
 /// Mode enumeration for quick switching
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Default)]
 #[serde(rename_all = "lowercase")]
 pub enum Mode {
     /// Minimal: fastest startup, basic prompt
     Minimal,
     /// Dev: balanced features (default)
+    #[default]
     Dev,
     /// Ops: maximum safety features
     Ops,
@@ -70,7 +71,7 @@ pub enum Mode {
 
 impl Mode {
     /// Parse mode from string
-    pub fn from_str(s: &str) -> Option<Self> {
+    pub fn parse_from_str(s: &str) -> Option<Self> {
         match s.to_lowercase().as_str() {
             "minimal" | "min" => Some(Self::Minimal),
             "dev" | "development" => Some(Self::Dev),
@@ -98,11 +99,7 @@ impl Mode {
     }
 }
 
-impl Default for Mode {
-    fn default() -> Self {
-        Self::Dev
-    }
-}
+
 
 impl std::fmt::Display for Mode {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -111,10 +108,11 @@ impl std::fmt::Display for Mode {
 }
 
 /// Icon mode enumeration
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Default)]
 #[serde(rename_all = "lowercase")]
 pub enum IconMode {
     /// Auto-detect based on terminal
+    #[default]
     Auto,
     /// Nerd Fonts icons
     Nerd,
@@ -124,12 +122,6 @@ pub enum IconMode {
     Ascii,
     /// No icons
     None,
-}
-
-impl Default for IconMode {
-    fn default() -> Self {
-        Self::Auto
-    }
 }
 
 /// Terminal color capability

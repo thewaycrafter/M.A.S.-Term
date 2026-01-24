@@ -1,10 +1,10 @@
 //! Plugin API trait and types
 
 use super::PluginManifest;
-use crate::cache;
+use std::path::PathBuf;
 use crate::prompt::Segment;
 use async_trait::async_trait;
-use std::path::PathBuf;
+
 use std::collections::HashMap;
 use thiserror::Error;
 

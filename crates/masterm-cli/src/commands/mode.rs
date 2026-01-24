@@ -27,7 +27,7 @@ async fn show_mode() -> Result<()> {
     let cwd = std::env::current_dir()?;
     let config = loader.load(&cwd)?;
 
-    let mode = Mode::from_str(&config.core.mode).unwrap_or_default();
+    let mode = Mode::parse_from_str(&config.core.mode).unwrap_or_default();
 
     println!("{}", style("Current Mode").bold());
     println!("{}", "─".repeat(40));
@@ -53,7 +53,7 @@ async fn show_mode() -> Result<()> {
 
 /// Set mode
 async fn set_mode(mode_str: &str) -> Result<()> {
-    let mode = Mode::from_str(mode_str)
+    let mode = Mode::parse_from_str(mode_str)
         .ok_or_else(|| anyhow::anyhow!("Invalid mode: {}. Use: minimal, dev, or ops", mode_str))?;
 
     // Read and update config

@@ -3,10 +3,11 @@
 use serde::{Deserialize, Serialize};
 
 /// Permission levels
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize, Default)]
 #[serde(rename_all = "lowercase")]
 pub enum Permission {
     /// No access
+    #[default]
     None,
     /// Read-only access
     Read,
@@ -14,11 +15,7 @@ pub enum Permission {
     Write,
 }
 
-impl Default for Permission {
-    fn default() -> Self {
-        Self::None
-    }
-}
+
 
 impl Permission {
     /// Check if this permission allows reading
@@ -32,11 +29,11 @@ impl Permission {
     }
 
     /// Parse from string
-    pub fn from_str(s: &str) -> Self {
+    pub fn parse_from_str(s: &str) -> Option<Self> {
         match s.to_lowercase().as_str() {
-            "read" => Self::Read,
-            "write" => Self::Write,
-            _ => Self::None,
+            "read" => Some(Self::Read),
+            "write" => Some(Self::Write),
+            _ => Some(Self::None), // Assuming Self::None is a valid parsed state for unrecognized strings
         }
     }
 }
@@ -109,14 +106,14 @@ impl PermissionSet {
     pub fn from_config(config: &super::PluginPermissions) -> Self {
         let filesystem = config.filesystem
             .first()
-            .map(|s| Permission::from_str(s))
+            .and_then(|s| Permission::parse_from_str(s))
             .unwrap_or_default();
 
-        let network = Permission::from_str(&config.network);
+        let network = Permission::parse_from_str(&config.network).unwrap_or_default();
 
         let environment = config.environment
             .first()
-            .map(|s| Permission::from_str(s))
+            .and_then(|s| Permission::parse_from_str(s))
             .unwrap_or_default();
 
         Self {

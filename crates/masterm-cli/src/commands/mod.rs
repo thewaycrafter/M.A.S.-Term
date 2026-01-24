@@ -12,7 +12,7 @@ pub mod profile;
 pub mod prompt;
 pub mod update;
 
-use console::style;
+
 
 /// Output formatting helpers
 pub mod output {
