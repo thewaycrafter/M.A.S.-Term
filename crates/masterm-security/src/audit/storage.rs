@@ -203,9 +203,7 @@ mod tests {
         let storage = AuditStorage::new(&log_path).await.unwrap();
 
         // Append some events
-        let event1 = AuditEvent::builder()
-            .command("ls -la")
-            .build(1);
+        let event1 = AuditEvent::builder().command("ls -la").build(1);
         storage.append(&event1).await.unwrap();
 
         let event2 = AuditEvent::builder()
@@ -229,9 +227,7 @@ mod tests {
         let storage = AuditStorage::new(&log_path).await.unwrap();
 
         // Build a valid chain
-        let event1 = AuditEvent::builder()
-            .command("first")
-            .build(1);
+        let event1 = AuditEvent::builder().command("first").build(1);
         storage.append(&event1).await.unwrap();
 
         let event2 = AuditEvent::builder()

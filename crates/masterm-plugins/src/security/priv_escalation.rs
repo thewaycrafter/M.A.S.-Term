@@ -76,10 +76,10 @@ impl PrivEscalationPlugin {
     /// Get current environment type
     fn detect_environment(&self) -> EnvironmentType {
         let cwd = std::env::current_dir().unwrap_or_default();
-        EnvironmentType::detect(&cwd, &[
-            "**/prod/**".to_string(),
-            "**/production/**".to_string(),
-        ])
+        EnvironmentType::detect(
+            &cwd,
+            &["**/prod/**".to_string(), "**/production/**".to_string()],
+        )
     }
 
     /// Get action for current environment
@@ -94,7 +94,7 @@ impl PrivEscalationPlugin {
     /// Format warning message
     fn format_warning(&self, priv_type: PrivilegeType, command: &str) -> String {
         let env = self.detect_environment();
-        
+
         format!(
             "\x1b[1;33m{} PRIVILEGE ESCALATION DETECTED\x1b[0m\n\n\
              Command: \x1b[1m{}\x1b[0m\n\
@@ -224,7 +224,7 @@ mod tests {
     #[test]
     fn test_sudo_detection() {
         let plugin = PrivEscalationPlugin::new();
-        
+
         // Default dev action is Allow
         let action = plugin.on_command("sudo apt update");
         // In dev environment, should be allowed

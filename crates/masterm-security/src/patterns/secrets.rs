@@ -529,7 +529,9 @@ mod tests {
     #[test]
     fn test_github_token_detection() {
         let matcher = SecretPatternMatcher::new();
-        let secrets = matcher.find_all("git clone https://ghp_aBcDeFgHiJkLmNoPqRsTuVwXyZ1234567890@github.com/user/repo");
+        let secrets = matcher.find_all(
+            "git clone https://ghp_aBcDeFgHiJkLmNoPqRsTuVwXyZ1234567890@github.com/user/repo",
+        );
         assert!(!secrets.is_empty());
         assert_eq!(secrets[0].category, SecretCategory::GitHubToken);
     }

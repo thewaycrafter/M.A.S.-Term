@@ -122,6 +122,14 @@ pub struct AuditConfig {
     pub exclude_commands: Vec<String>,
 }
 
+impl AuditConfig {
+    /// Load audit configuration (or default)
+    pub fn load() -> crate::SecurityResult<Self> {
+        // TODO: Load from actual config file
+        Ok(Self::default())
+    }
+}
+
 impl Default for AuditConfig {
     fn default() -> Self {
         Self {

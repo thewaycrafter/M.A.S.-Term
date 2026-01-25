@@ -82,7 +82,7 @@ impl NetworkMonitorPlugin {
         // Detect command type
         let _cmd_lower = cmd.to_lowercase();
         let words: Vec<&str> = cmd.split_whitespace().collect();
-        
+
         if words.is_empty() {
             return connections;
         }
@@ -94,7 +94,10 @@ impl NetworkMonitorPlugin {
         for cap in url_re.captures_iter(cmd) {
             connections.push(NetworkConnection {
                 command_type: first_word.to_string(),
-                target: cap.get(2).map(|m| m.as_str().to_string()).unwrap_or_default(),
+                target: cap
+                    .get(2)
+                    .map(|m| m.as_str().to_string())
+                    .unwrap_or_default(),
                 port: cap.get(3).and_then(|m| m.as_str().parse().ok()),
                 protocol: cap.get(1).map(|m| m.as_str().to_string()),
             });
@@ -106,14 +109,19 @@ impl NetworkMonitorPlugin {
             let host_re = Regex::new(r"(?:[\w-]+@)?([\w.-]+)").unwrap();
             let port_re = Regex::new(r"-p\s*(\d+)").unwrap();
 
-            let port = port_re.captures(cmd).and_then(|c| c.get(1)?.as_str().parse().ok());
+            let port = port_re
+                .captures(cmd)
+                .and_then(|c| c.get(1)?.as_str().parse().ok());
 
             for word in &words[1..] {
                 if !word.starts_with('-') && !word.contains('/') {
                     if let Some(cap) = host_re.captures(word) {
                         connections.push(NetworkConnection {
                             command_type: first_word.to_string(),
-                            target: cap.get(1).map(|m| m.as_str().to_string()).unwrap_or_default(),
+                            target: cap
+                                .get(1)
+                                .map(|m| m.as_str().to_string())
+                                .unwrap_or_default(),
                             port,
                             protocol: Some("ssh".to_string()),
                         });
@@ -125,7 +133,12 @@ impl NetworkMonitorPlugin {
 
         // Netcat pattern: nc [host] [port]
         if first_word == "nc" || first_word == "netcat" || first_word == "ncat" {
-            let args: Vec<&str> = words.iter().skip(1).filter(|w| !w.starts_with('-')).copied().collect();
+            let args: Vec<&str> = words
+                .iter()
+                .skip(1)
+                .filter(|w| !w.starts_with('-'))
+                .copied()
+                .collect();
             if args.len() >= 2 {
                 connections.push(NetworkConnection {
                     command_type: first_word.to_string(),
@@ -141,7 +154,10 @@ impl NetworkMonitorPlugin {
         for cap in ip_port_re.captures_iter(cmd) {
             connections.push(NetworkConnection {
                 command_type: first_word.to_string(),
-                target: cap.get(1).map(|m| m.as_str().to_string()).unwrap_or_default(),
+                target: cap
+                    .get(1)
+                    .map(|m| m.as_str().to_string())
+                    .unwrap_or_default(),
                 port: cap.get(2).and_then(|m| m.as_str().parse().ok()),
                 protocol: None,
             });
@@ -175,7 +191,9 @@ impl NetworkMonitorPlugin {
             Some("http") | Some("https") => vec![80, 443, 8080, 8443],
             Some("ssh") => vec![22],
             Some("ftp") => vec![21],
-            _ => vec![80, 443, 22, 21, 25, 53, 110, 143, 993, 995, 3306, 5432, 6379, 27017],
+            _ => vec![
+                80, 443, 22, 21, 25, 53, 110, 143, 993, 995, 3306, 5432, 6379, 27017,
+            ],
         };
 
         !standard_ports.contains(&port)
@@ -184,8 +202,15 @@ impl NetworkMonitorPlugin {
     /// Format connection info
     fn format_connection(&self, conn: &NetworkConnection) -> String {
         let port_str = conn.port.map(|p| format!(":{}", p)).unwrap_or_default();
-        let protocol_str = conn.protocol.as_ref().map(|p| format!("{} ", p)).unwrap_or_default();
-        format!("🌐 {} → {}{}{}", conn.command_type, protocol_str, conn.target, port_str)
+        let protocol_str = conn
+            .protocol
+            .as_ref()
+            .map(|p| format!("{} ", p))
+            .unwrap_or_default();
+        format!(
+            "🌐 {} → {}{}{}",
+            conn.command_type, protocol_str, conn.target, port_str
+        )
     }
 }
 

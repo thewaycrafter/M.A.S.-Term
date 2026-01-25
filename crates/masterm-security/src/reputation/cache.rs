@@ -56,11 +56,7 @@ pub struct ThreatInfo {
 
 impl ThreatInfo {
     /// Create new threat info
-    pub fn new(
-        threat_type: impl Into<String>,
-        confidence: u8,
-        source: impl Into<String>,
-    ) -> Self {
+    pub fn new(threat_type: impl Into<String>, confidence: u8, source: impl Into<String>) -> Self {
         Self {
             threat_type: threat_type.into(),
             confidence,
@@ -306,7 +302,9 @@ pub fn extract_targets(command: &str) -> Vec<String> {
     }
 
     // Domain pattern (simplified)
-    if let Ok(domain_re) = Regex::new(r"(?:https?://)?([a-zA-Z0-9][-a-zA-Z0-9]*(?:\.[a-zA-Z0-9][-a-zA-Z0-9]*)+)") {
+    if let Ok(domain_re) =
+        Regex::new(r"(?:https?://)?([a-zA-Z0-9][-a-zA-Z0-9]*(?:\.[a-zA-Z0-9][-a-zA-Z0-9]*)+)")
+    {
         for cap in domain_re.captures_iter(command) {
             if let Some(domain) = cap.get(1) {
                 let d = domain.as_str().to_lowercase();

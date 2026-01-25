@@ -189,30 +189,22 @@ fn get_warning(priv_type: PrivilegeType) -> String {
         PrivilegeType::Sudo => {
             "This command will execute with superuser (root) privileges via sudo."
         }
-        PrivilegeType::Su => {
-            "This command will switch to another user account (typically root)."
-        }
-        PrivilegeType::Doas => {
-            "This command will execute with elevated privileges via doas."
-        }
+        PrivilegeType::Su => "This command will switch to another user account (typically root).",
+        PrivilegeType::Doas => "This command will execute with elevated privileges via doas.",
         PrivilegeType::Pkexec => {
             "This command will execute with elevated privileges via PolicyKit."
         }
         PrivilegeType::ChmodDangerous => {
             "This command sets dangerous file permissions (world-writable or setuid)."
         }
-        PrivilegeType::ChownRoot => {
-            "This command changes file ownership to root."
-        }
+        PrivilegeType::ChownRoot => "This command changes file ownership to root.",
         PrivilegeType::Setcap => {
             "This command modifies file capabilities, which can grant special privileges."
         }
         PrivilegeType::SetuidSetgid => {
             "This command sets the setuid or setgid bit, allowing privilege escalation."
         }
-        PrivilegeType::Other => {
-            "This command involves privilege escalation."
-        }
+        PrivilegeType::Other => "This command involves privilege escalation.",
     }
     .to_string()
 }

@@ -67,8 +67,14 @@ async fn run_status(args: StatusArgs) -> Result<()> {
     let config_exists = config_path.exists();
 
     println!();
-    println!("  {} Configuration file", 
-        if config_exists { style("✓").green() } else { style("✗").red() });
+    println!(
+        "  {} Configuration file",
+        if config_exists {
+            style("✓").green()
+        } else {
+            style("✗").red()
+        }
+    );
 
     // Check audit log
     let audit_path = dirs::home_dir()
@@ -77,29 +83,43 @@ async fn run_status(args: StatusArgs) -> Result<()> {
 
     let audit_exists = audit_path.exists();
     let audit_size = if audit_exists {
-        std::fs::metadata(&audit_path)
-            .map(|m| m.len())
-            .unwrap_or(0)
+        std::fs::metadata(&audit_path).map(|m| m.len()).unwrap_or(0)
     } else {
         0
     };
 
-    println!("  {} Audit logging ({})", 
-        if audit_exists { style("✓").green() } else { style("○").dim() },
-        if audit_exists { format_size(audit_size) } else { "not active".to_string() });
+    println!(
+        "  {} Audit logging ({})",
+        if audit_exists {
+            style("✓").green()
+        } else {
+            style("○").dim()
+        },
+        if audit_exists {
+            format_size(audit_size)
+        } else {
+            "not active".to_string()
+        }
+    );
 
     // Check sandbox mode
     let sandbox_active = std::env::var("MASTERM_SANDBOX")
         .map(|v| v == "1")
         .unwrap_or(false);
 
-    println!("  {} Sandbox mode", 
-        if sandbox_active { style("●").cyan() } else { style("○").dim() });
+    println!(
+        "  {} Sandbox mode",
+        if sandbox_active {
+            style("●").cyan()
+        } else {
+            style("○").dim()
+        }
+    );
 
     // Security plugins status
     println!();
     println!("{}", style("Security Plugins:").bold());
-    
+
     let plugins = [
         ("secret-detection", "Detect hardcoded secrets"),
         ("audit-log", "Forensic command logging"),
@@ -224,7 +244,7 @@ async fn run_audit_show(args: AuditShowArgs) -> Result<()> {
         }
     } else {
         output::header("📋 Recent Audit Log Entries");
-        
+
         for line in lines.iter().rev() {
             if let Ok(entry) = serde_json::from_str::<serde_json::Value>(line) {
                 let timestamp = entry["timestamp"].as_str().unwrap_or("?");
@@ -332,7 +352,10 @@ async fn run_audit_clear(args: AuditClearArgs) -> Result<()> {
     }
 
     if !args.force {
-        println!("{}", style("⚠️  Warning: This will permanently delete all audit logs.").yellow());
+        println!(
+            "{}",
+            style("⚠️  Warning: This will permanently delete all audit logs.").yellow()
+        );
         print!("Are you sure? Type 'yes' to confirm: ");
         std::io::Write::flush(&mut std::io::stdout())?;
 
@@ -366,7 +389,10 @@ pub struct CheckArgs {
 }
 
 async fn run_check(args: CheckArgs) -> Result<()> {
-    use masterm_security::patterns::SecurityPatternMatcher;
+    use masterm_security::{
+        audit::AuditLogger, config::AuditConfig, crypto::CryptoMonitor, network::NetworkMonitor,
+        patterns::SecurityPatternMatcher, pkg::PackageAuditor,
+    };
 
     let command = args.command.join(" ");
 
@@ -375,8 +401,39 @@ async fn run_check(args: CheckArgs) -> Result<()> {
         return Ok(());
     }
 
+    // 1. Pattern Analysis (Secrets, Threats, Privilege)
     let matcher = SecurityPatternMatcher::new();
     let analysis = matcher.analyze(&command);
+
+    // 2. Network Analysis
+    let net_monitor = NetworkMonitor::default();
+    let net_analysis = net_monitor.analyze(&command)?;
+
+    // 3. Package Audit
+    let pkg_install = PackageAuditor::analyze(&command);
+
+    // 4. Crypto Monitor
+    let crypto_usage = CryptoMonitor::analyze(&command);
+
+    // 5. Audit Logging (Background)
+    // We log the attempt. Result is unknown at this stage since it's pre-exec.
+    // In a real shell integration, we might want to log in precmd (after execution)
+    // to capture exit code, but logging here ensures we capture even if shell crashes.
+    let audit_config = AuditConfig::load().unwrap_or_default();
+    if audit_config.enabled {
+        if let Ok(logger) = AuditLogger::new(audit_config).await {
+            let cwd = std::env::current_dir().unwrap_or_default();
+            let _ = logger
+                .log_command(
+                    &command,
+                    &cwd,
+                    "unknown", // Shell inference could be passed in args
+                    "dev",     // Env inference needed
+                    analysis.security_flags(),
+                )
+                .await;
+        }
+    }
 
     if args.json {
         let result = serde_json::json!({
@@ -384,6 +441,13 @@ async fn run_check(args: CheckArgs) -> Result<()> {
             "secrets_found": analysis.secrets.len(),
             "threats_found": analysis.threats.len(),
             "privilege_escalation": analysis.privilege.is_some(),
+            "network_activity": {
+                "is_bound": net_analysis.is_network_bound,
+                "urls": net_analysis.urls,
+                "tool": net_analysis.tool,
+            },
+            "package_install": pkg_install.map(|p| format!("{:?}", p.manager)),
+            "crypto_usage": crypto_usage.map(|c| format!("{:?}", c.operation)),
             "risk_level": analysis.max_risk_level().name(),
         });
         println!("{}", serde_json::to_string_pretty(&result)?);
@@ -393,46 +457,87 @@ async fn run_check(args: CheckArgs) -> Result<()> {
         println!("  Command: {}", style(&command).cyan());
         println!();
 
-        if analysis.secrets.is_empty() && analysis.threats.is_empty() && analysis.privilege.is_none() {
+        let mut issues_found = false;
+
+        // Secrets
+        if !analysis.secrets.is_empty() {
+            issues_found = true;
+            println!("{}", style("  🔐 Secrets Detected:").yellow().bold());
+            for secret in &analysis.secrets {
+                println!(
+                    "     {} {} ({})",
+                    secret.category.icon(),
+                    secret.category.name(),
+                    secret.matched_text
+                );
+            }
+            println!();
+        }
+
+        // Threats
+        if !analysis.threats.is_empty() {
+            issues_found = true;
+            println!("{}", style("  ⚠️  Threats Detected:").red().bold());
+            for threat in &analysis.threats {
+                println!(
+                    "     {} {} - {}",
+                    threat.category.icon(),
+                    threat.category.name(),
+                    threat.description
+                );
+            }
+            println!();
+        }
+
+        // Privilege
+        if let Some(ref priv_match) = analysis.privilege {
+            issues_found = true;
+            println!("{}", style("  👑 Privilege Escalation:").yellow().bold());
+            println!("     {} detected", priv_match.priv_type.name());
+            println!();
+        }
+
+        // Network
+        if net_analysis.is_network_bound {
+            println!("{}", style("  🌐 Network Activity:").blue().bold());
+            if let Some(tool) = &net_analysis.tool {
+                println!("     Tool: {}", tool);
+            }
+            if !net_analysis.urls.is_empty() {
+                println!("     URLs:");
+                for url in &net_analysis.urls {
+                    println!("       - {}", url);
+                }
+            }
+            println!();
+        }
+
+        // Package
+        if let Some(pkg) = pkg_install {
+            println!("{}", style("  📦 Package Installation:").magenta().bold());
+            println!("     Manager: {:?}", pkg.manager);
+            println!("     Packages: {}", pkg.packages.join(", "));
+            if pkg.is_global {
+                println!("     {} Global installation detected", style("⚠️").yellow());
+            }
+            println!();
+        }
+
+        // Crypto
+        if let Some(crypto) = crypto_usage {
+            println!("{}", style("  🔑 Crypto Operation:").green().bold());
+            println!("     Type: {:?}", crypto.key_type);
+            println!("     Operation: {:?}", crypto.operation);
+            println!();
+        }
+
+        if !issues_found && !net_analysis.is_network_bound {
             println!("  {} No security issues detected", style("✓").green());
         } else {
-            // Secrets
-            if !analysis.secrets.is_empty() {
-                println!("{}", style("  🔐 Secrets Detected:").yellow().bold());
-                for secret in &analysis.secrets {
-                    println!("     {} {} ({})", 
-                        secret.category.icon(),
-                        secret.category.name(),
-                        secret.matched_text
-                    );
-                }
-                println!();
-            }
-
-            // Threats
-            if !analysis.threats.is_empty() {
-                println!("{}", style("  ⚠️  Threats Detected:").red().bold());
-                for threat in &analysis.threats {
-                    println!("     {} {} - {}", 
-                        threat.category.icon(),
-                        threat.category.name(),
-                        threat.description
-                    );
-                }
-                println!();
-            }
-
-            // Privilege
-            if let Some(ref priv_match) = analysis.privilege {
-                println!("{}", style("  👑 Privilege Escalation:").yellow().bold());
-                println!("     {} detected", priv_match.priv_type.name());
-                println!();
-            }
-
-            println!("  Risk Level: {}{}{}", 
+            println!(
+                "  Risk Level: {}{}\x1b[0m",
                 analysis.max_risk_level().color(),
-                analysis.max_risk_level().name(),
-                "\x1b[0m"
+                analysis.max_risk_level().name()
             );
         }
     }
@@ -499,7 +604,10 @@ async fn run_config(action: SecurityConfigAction) -> Result<()> {
             if valid_levels.contains(&level.as_str()) {
                 output::success(&format!("Security level set to: {}", level));
             } else {
-                output::error(&format!("Invalid level. Use one of: {}", valid_levels.join(", ")));
+                output::error(&format!(
+                    "Invalid level. Use one of: {}",
+                    valid_levels.join(", ")
+                ));
             }
         }
     }
@@ -541,21 +649,27 @@ async fn run_sandbox(action: SandboxAction) -> Result<()> {
             if args.allow_net {
                 std::env::set_var("MASTERM_SANDBOX_NET", "1");
             }
-            
+
             output::header("🧪 Entering Sandbox Mode");
             println!();
             println!("  Restrictions:");
             println!("    • Privilege escalation blocked");
-            println!("    • Network access: {}", 
-                if args.allow_net { style("allowed").green() } else { style("blocked").red() });
-            
+            println!(
+                "    • Network access: {}",
+                if args.allow_net {
+                    style("allowed").green()
+                } else {
+                    style("blocked").red()
+                }
+            );
+
             if !args.allowed_dirs.is_empty() {
                 println!("    • Allowed directories:");
                 for dir in &args.allowed_dirs {
                     println!("      - {}", dir.display());
                 }
             }
-            
+
             println!();
             output::info("Type 'masterm security sandbox exit' to leave sandbox mode.");
         }
@@ -568,15 +682,21 @@ async fn run_sandbox(action: SandboxAction) -> Result<()> {
             let active = std::env::var("MASTERM_SANDBOX")
                 .map(|v| v == "1")
                 .unwrap_or(false);
-            
+
             if active {
                 let net_allowed = std::env::var("MASTERM_SANDBOX_NET")
                     .map(|v| v == "1")
                     .unwrap_or(false);
-                
+
                 println!("  Sandbox mode: {}", style("ACTIVE").cyan().bold());
-                println!("  Network: {}", 
-                    if net_allowed { style("allowed").green() } else { style("blocked").red() });
+                println!(
+                    "  Network: {}",
+                    if net_allowed {
+                        style("allowed").green()
+                    } else {
+                        style("blocked").red()
+                    }
+                );
             } else {
                 println!("  Sandbox mode: {}", style("inactive").dim());
             }
@@ -599,9 +719,9 @@ pub struct PatternsArgs {
 
 async fn run_patterns(args: PatternsArgs) -> Result<()> {
     output::header("🔍 Security Patterns");
-    
+
     let show_all = args.pattern_type == "all";
-    
+
     if show_all || args.pattern_type == "secrets" {
         println!();
         println!("{}", style("Secret Patterns:").bold());

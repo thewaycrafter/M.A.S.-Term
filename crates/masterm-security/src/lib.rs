@@ -26,8 +26,13 @@
 
 pub mod audit;
 pub mod config;
+pub mod crypto;
+pub mod integrity;
+pub mod network;
 pub mod patterns;
+pub mod pkg;
 pub mod reputation;
+pub mod sandbox;
 
 pub use audit::{AuditEvent, AuditLogger, AuditStorage};
 pub use config::SecurityConfig;

@@ -116,6 +116,25 @@ impl SecurityAnalysis {
 
         max
     }
+
+    /// Get security flags for audit logs
+    pub fn security_flags(&self) -> Vec<String> {
+        let mut flags = Vec::new();
+
+        if !self.secrets.is_empty() {
+            flags.push("SECRET_DETECTED".to_string());
+        }
+
+        if !self.threats.is_empty() {
+            flags.push("THREAT_DETECTED".to_string());
+        }
+
+        if self.privilege.is_some() {
+            flags.push("PRIVILEGE_ESCALATION".to_string());
+        }
+
+        flags
+    }
 }
 
 /// Risk level enumeration
@@ -133,9 +152,9 @@ impl RiskLevel {
     pub fn color(&self) -> &'static str {
         match self {
             Self::None => "\x1b[0m",
-            Self::Low => "\x1b[34m",     // Blue
-            Self::Medium => "\x1b[33m",  // Yellow
-            Self::High => "\x1b[91m",    // Light Red
+            Self::Low => "\x1b[34m",      // Blue
+            Self::Medium => "\x1b[33m",   // Yellow
+            Self::High => "\x1b[91m",     // Light Red
             Self::Critical => "\x1b[31m", // Red
         }
     }

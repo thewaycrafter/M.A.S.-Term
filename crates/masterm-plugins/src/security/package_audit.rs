@@ -15,7 +15,6 @@ use masterm_core::plugin::{
 };
 use masterm_core::prompt::Segment;
 
-
 /// Package info extracted from command
 #[allow(dead_code)]
 #[derive(Debug, Clone)]
@@ -90,8 +89,10 @@ impl PackageAuditPlugin {
         let cmd_lower = cmd.to_lowercase();
 
         // npm install
-        if cmd_lower.contains("npm install") || cmd_lower.contains("npm i ") 
-            || cmd_lower.contains("yarn add") || cmd_lower.contains("pnpm add") 
+        if cmd_lower.contains("npm install")
+            || cmd_lower.contains("npm i ")
+            || cmd_lower.contains("yarn add")
+            || cmd_lower.contains("pnpm add")
         {
             let manager = if cmd_lower.contains("npm") {
                 "npm"
@@ -105,8 +106,13 @@ impl PackageAuditPlugin {
 
             // Find package names (skip flags)
             for word in &words {
-                if word.starts_with('-') || *word == "install" || *word == "add" || *word == "i" 
-                    || *word == "npm" || *word == "yarn" || *word == "pnpm" 
+                if word.starts_with('-')
+                    || *word == "install"
+                    || *word == "add"
+                    || *word == "i"
+                    || *word == "npm"
+                    || *word == "yarn"
+                    || *word == "pnpm"
                 {
                     continue;
                 }
@@ -114,7 +120,10 @@ impl PackageAuditPlugin {
                 // Parse package@version
                 let (name, version) = if word.contains('@') && !word.starts_with('@') {
                     let parts: Vec<&str> = word.splitn(2, '@').collect();
-                    (parts[0].to_string(), Some(parts.get(1).unwrap_or(&"").to_string()))
+                    (
+                        parts[0].to_string(),
+                        Some(parts.get(1).unwrap_or(&"").to_string()),
+                    )
                 } else {
                     (word.to_string(), None)
                 };
@@ -133,13 +142,17 @@ impl PackageAuditPlugin {
         // pip install
         if cmd_lower.contains("pip install") || cmd_lower.contains("pip3 install") {
             for word in &words {
-                if word.starts_with('-') || *word == "install" || *word == "pip" || *word == "pip3" {
+                if word.starts_with('-') || *word == "install" || *word == "pip" || *word == "pip3"
+                {
                     continue;
                 }
 
                 let (name, version) = if word.contains("==") {
                     let parts: Vec<&str> = word.splitn(2, "==").collect();
-                    (parts[0].to_string(), Some(parts.get(1).unwrap_or(&"").to_string()))
+                    (
+                        parts[0].to_string(),
+                        Some(parts.get(1).unwrap_or(&"").to_string()),
+                    )
                 } else {
                     (word.to_string(), None)
                 };
@@ -327,16 +340,20 @@ fn levenshtein_distance(a: &str, b: &str) -> usize {
 
     let mut matrix = vec![vec![0usize; b_len + 1]; a_len + 1];
 
-    for i in 0..=a_len {
-        matrix[i][0] = i;
+    for (i, row) in matrix.iter_mut().enumerate().take(a_len + 1) {
+        row[0] = i;
     }
-    for j in 0..=b_len {
-        matrix[0][j] = j;
+    for (j, cell) in matrix[0].iter_mut().enumerate().take(b_len + 1) {
+        *cell = j;
     }
 
     for i in 1..=a_len {
         for j in 1..=b_len {
-            let cost = if a_chars[i - 1] == b_chars[j - 1] { 0 } else { 1 };
+            let cost = if a_chars[i - 1] == b_chars[j - 1] {
+                0
+            } else {
+                1
+            };
             matrix[i][j] = std::cmp::min(
                 std::cmp::min(matrix[i - 1][j] + 1, matrix[i][j - 1] + 1),
                 matrix[i - 1][j - 1] + cost,

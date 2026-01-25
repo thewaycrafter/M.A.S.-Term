@@ -56,7 +56,7 @@ impl AuditLogger {
     pub async fn log_command(
         &self,
         command: &str,
-        cwd: &PathBuf,
+        cwd: &std::path::Path,
         shell: &str,
         env_type: &str,
         security_flags: Vec<String>,
@@ -75,7 +75,7 @@ impl AuditLogger {
 
         let event = AuditEvent::builder()
             .command(self.maybe_redact(command))
-            .cwd(cwd.clone())
+            .cwd(cwd.to_path_buf())
             .shell(shell)
             .env_type(env_type)
             .security_flags(security_flags)
@@ -99,7 +99,7 @@ impl AuditLogger {
     pub async fn log_command_with_result(
         &self,
         command: &str,
-        cwd: &PathBuf,
+        cwd: &std::path::Path,
         shell: &str,
         env_type: &str,
         security_flags: Vec<String>,
@@ -118,7 +118,7 @@ impl AuditLogger {
 
         let event = AuditEvent::builder()
             .command(self.maybe_redact(command))
-            .cwd(cwd.clone())
+            .cwd(cwd.to_path_buf())
             .shell(shell)
             .env_type(env_type)
             .security_flags(security_flags)

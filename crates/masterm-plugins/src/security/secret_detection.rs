@@ -95,7 +95,9 @@ impl SecretDetectionPlugin {
     /// Format the confirmation message
     fn format_confirmation(&self, secrets: &[SecretMatch]) -> String {
         let mut msg = self.format_warning(secrets);
-        msg.push_str("\nType '\x1b[1;32myes\x1b[0m' to continue or '\x1b[1;31mno\x1b[0m' to cancel:");
+        msg.push_str(
+            "\nType '\x1b[1;32myes\x1b[0m' to continue or '\x1b[1;31mno\x1b[0m' to cancel:",
+        );
         msg
     }
 
@@ -112,7 +114,9 @@ impl SecretDetectionPlugin {
             ));
         }
 
-        msg.push_str("\n\x1b[31mThis command was blocked because it contains sensitive data.\x1b[0m\n");
+        msg.push_str(
+            "\n\x1b[31mThis command was blocked because it contains sensitive data.\x1b[0m\n",
+        );
         msg.push_str("Remove the secret and use environment variables instead.\n");
 
         msg
@@ -185,7 +189,9 @@ mod tests {
         assert!(matches!(action, CommandAction::Confirm(_)));
 
         // GitHub token should be detected (ghp_ + 36 chars)
-        let action = plugin.on_command("git clone https://ghp_aBcDeFgHiJkLmNoPqRsTuVwXyZ0123456789@github.com/repo");
+        let action = plugin.on_command(
+            "git clone https://ghp_aBcDeFgHiJkLmNoPqRsTuVwXyZ0123456789@github.com/repo",
+        );
         assert!(matches!(action, CommandAction::Confirm(_)));
 
         // Normal command should be allowed

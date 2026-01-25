@@ -203,9 +203,9 @@ impl AuditEventBuilder {
             timestamp: Utc::now(),
             command: self.command.unwrap_or_default(),
             cwd: self.cwd.unwrap_or_else(|| PathBuf::from("/")),
-            user: self.user.unwrap_or_else(|| whoami()),
+            user: self.user.unwrap_or_else(whoami),
             shell: self.shell.unwrap_or_else(|| "unknown".to_string()),
-            pid: self.pid.unwrap_or_else(|| std::process::id()),
+            pid: self.pid.unwrap_or_else(std::process::id),
             ppid: self.ppid,
             result: self.result,
             env_type: self.env_type.unwrap_or_else(|| "unknown".to_string()),
@@ -240,11 +240,17 @@ fn redact_secrets(command: &str) -> String {
         // GitHub tokens
         (r"(gh[pous]_[A-Za-z0-9]{36})", "[GITHUB_TOKEN_REDACTED]"),
         // Generic API keys
-        (r#"(?i)(api[_-]?key[=:]\s*)['"]?([A-Za-z0-9\-_]{20,})['"]?"#, "$1[REDACTED]"),
+        (
+            r#"(?i)(api[_-]?key[=:]\s*)['"]?([A-Za-z0-9\-_]{20,})['"]?"#,
+            "$1[REDACTED]",
+        ),
         // Passwords in URLs
         (r"(://[^:]+:)[^@]+(@)", "$1[REDACTED]$2"),
         // Generic secrets
-        (r#"(?i)(secret[=:]\s*)['"]?([A-Za-z0-9\-_]{20,})['"]?"#, "$1[REDACTED]"),
+        (
+            r#"(?i)(secret[=:]\s*)['"]?([A-Za-z0-9\-_]{20,})['"]?"#,
+            "$1[REDACTED]",
+        ),
     ];
 
     for (pattern, replacement) in patterns {
@@ -279,18 +285,14 @@ mod tests {
 
     #[test]
     fn test_hash_verification() {
-        let event = AuditEvent::builder()
-            .command("test command")
-            .build(1);
+        let event = AuditEvent::builder().command("test command").build(1);
 
         assert!(event.verify_hash());
     }
 
     #[test]
     fn test_hash_chain() {
-        let event1 = AuditEvent::builder()
-            .command("first command")
-            .build(1);
+        let event1 = AuditEvent::builder().command("first command").build(1);
 
         let event2 = AuditEvent::builder()
             .command("second command")
@@ -303,7 +305,9 @@ mod tests {
 
     #[test]
     fn test_secret_redaction() {
-        let redacted = redact_secrets("git clone https://ghp_aBcDeFgHiJkLmNoPqRsTuVwXyZ0123456789@github.com/user/repo");
+        let redacted = redact_secrets(
+            "git clone https://ghp_aBcDeFgHiJkLmNoPqRsTuVwXyZ0123456789@github.com/user/repo",
+        );
         assert!(redacted.contains("[GITHUB_TOKEN_REDACTED]"));
         assert!(!redacted.contains("ghp_"));
 

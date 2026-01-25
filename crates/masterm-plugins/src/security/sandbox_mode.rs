@@ -80,7 +80,9 @@ impl SandboxPlugin {
     /// Is sandbox mode active?
     pub fn is_active(&self) -> bool {
         self.active.load(Ordering::SeqCst)
-            || std::env::var("MASTERM_SANDBOX").map(|v| v == "1").unwrap_or(false)
+            || std::env::var("MASTERM_SANDBOX")
+                .map(|v| v == "1")
+                .unwrap_or(false)
     }
 
     /// Check if command is blocked in sandbox
@@ -95,8 +97,10 @@ impl SandboxPlugin {
         }
 
         // Check for privilege escalation
-        if cmd_lower.starts_with("sudo ") || cmd_lower.starts_with("su ") 
-            || cmd_lower.starts_with("doas ") || cmd_lower.starts_with("pkexec ") 
+        if cmd_lower.starts_with("sudo ")
+            || cmd_lower.starts_with("su ")
+            || cmd_lower.starts_with("doas ")
+            || cmd_lower.starts_with("pkexec ")
         {
             return Some("privilege escalation".to_string());
         }
@@ -111,7 +115,7 @@ impl SandboxPlugin {
         }
 
         let words: Vec<&str> = cmd.split_whitespace().collect();
-        
+
         for word in &words[1..] {
             if word.starts_with('-') {
                 continue;
@@ -128,9 +132,10 @@ impl SandboxPlugin {
                 };
 
                 // Check if path is within allowed directories
-                let is_allowed = self.allowed_dirs.iter().any(|allowed| {
-                    path.starts_with(allowed)
-                });
+                let is_allowed = self
+                    .allowed_dirs
+                    .iter()
+                    .any(|allowed| path.starts_with(allowed));
 
                 if !is_allowed {
                     return Some(word.to_string());
@@ -148,8 +153,21 @@ impl SandboxPlugin {
         }
 
         let network_commands = [
-            "curl", "wget", "ssh", "scp", "sftp", "rsync", "nc", "netcat", 
-            "ncat", "telnet", "ftp", "ping", "traceroute", "dig", "nslookup",
+            "curl",
+            "wget",
+            "ssh",
+            "scp",
+            "sftp",
+            "rsync",
+            "nc",
+            "netcat",
+            "ncat",
+            "telnet",
+            "ftp",
+            "ping",
+            "traceroute",
+            "dig",
+            "nslookup",
         ];
 
         let first_word = cmd.split_whitespace().next().unwrap_or("").to_lowercase();
@@ -181,7 +199,10 @@ impl Plugin for SandboxPlugin {
         }
 
         // Check if sandbox should be active from environment
-        if std::env::var("MASTERM_SANDBOX").map(|v| v == "1").unwrap_or(false) {
+        if std::env::var("MASTERM_SANDBOX")
+            .map(|v| v == "1")
+            .unwrap_or(false)
+        {
             self.active.store(true, Ordering::SeqCst);
         }
 
@@ -233,7 +254,8 @@ impl Plugin for SandboxPlugin {
                  In sandbox mode, you can only access:\n{}\n\n\
                  Use 'masterm sandbox exit' to leave sandbox mode.\n",
                 path,
-                self.allowed_dirs.iter()
+                self.allowed_dirs
+                    .iter()
                     .map(|p| format!("  • {}", p.display()))
                     .collect::<Vec<_>>()
                     .join("\n")

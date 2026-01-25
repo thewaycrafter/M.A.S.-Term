@@ -143,13 +143,23 @@ impl FileIntegrityPlugin {
             Some(AccessType::Delete)
         } else if first_word == "chmod" || first_word == "chown" || first_word == "chattr" {
             Some(AccessType::Permission)
-        } else if ["vim", "vi", "nano", "emacs", "code", "subl", "edit"].contains(&first_word.as_str()) {
+        } else if ["vim", "vi", "nano", "emacs", "code", "subl", "edit"]
+            .contains(&first_word.as_str())
+        {
             Some(AccessType::Write)
-        } else if ["cat", "less", "more", "head", "tail", "grep", "awk", "sed"].contains(&first_word.as_str()) {
-            Some(if cmd.contains('>') { AccessType::Write } else { AccessType::Read })
-        } else if ["cp", "mv", "ln"].contains(&first_word.as_str()) {
-            Some(AccessType::Write)
-        } else if first_word == "touch" || cmd.contains('>') || cmd.contains(">>") {
+        } else if ["cat", "less", "more", "head", "tail", "grep", "awk", "sed"]
+            .contains(&first_word.as_str())
+        {
+            Some(if cmd.contains('>') {
+                AccessType::Write
+            } else {
+                AccessType::Read
+            })
+        } else if ["cp", "mv", "ln"].contains(&first_word.as_str())
+            || first_word == "touch"
+            || cmd.contains('>')
+            || cmd.contains(">>")
+        {
             Some(AccessType::Write)
         } else {
             None
@@ -257,14 +267,20 @@ impl Plugin for FileIntegrityPlugin {
         let accesses = self.detect_access(cmd);
 
         // Filter to only alertable accesses
-        let alertable: Vec<_> = accesses.iter().filter(|a| self.should_alert(a)).cloned().collect();
+        let alertable: Vec<_> = accesses
+            .iter()
+            .filter(|a| self.should_alert(a))
+            .cloned()
+            .collect();
 
         if alertable.is_empty() {
             return CommandAction::Allow;
         }
 
         // Delete operations get blocked in production
-        let has_delete = alertable.iter().any(|a| a.access_type == AccessType::Delete);
+        let has_delete = alertable
+            .iter()
+            .any(|a| a.access_type == AccessType::Delete);
         if has_delete {
             return CommandAction::Confirm(self.format_alert(&alertable));
         }

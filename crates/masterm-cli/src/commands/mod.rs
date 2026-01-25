@@ -1,6 +1,7 @@
 //! CLI command modules
 
 pub mod cache;
+pub mod check;
 pub mod completions;
 pub mod config;
 pub mod dashboard;
@@ -16,8 +17,6 @@ pub mod setup;
 pub mod sync;
 pub mod update;
 pub mod welcome;
-pub mod check;
-
 
 /// Output formatting helpers
 pub mod output {

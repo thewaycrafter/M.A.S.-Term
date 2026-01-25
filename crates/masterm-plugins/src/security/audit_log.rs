@@ -233,7 +233,9 @@ mod tests {
         let redacted = plugin.redact_command("export AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE");
         assert!(redacted.contains("[AWS_KEY]"));
 
-        let redacted = plugin.redact_command("git clone https://ghp_aBcDeFgHiJkLmNoPqRsTuVwXyZ0123456789@github.com/repo");
+        let redacted = plugin.redact_command(
+            "git clone https://ghp_aBcDeFgHiJkLmNoPqRsTuVwXyZ0123456789@github.com/repo",
+        );
         assert!(redacted.contains("[GH_TOKEN]"));
 
         let redacted = plugin.redact_command("curl https://user:password123@api.example.com");

@@ -31,7 +31,8 @@ impl IpReputationPlugin {
                 plugin: PluginMeta {
                     name: "ip-reputation".to_string(),
                     version: "1.0.0".to_string(),
-                    description: "Check IP/domain reputation against threat intelligence".to_string(),
+                    description: "Check IP/domain reputation against threat intelligence"
+                        .to_string(),
                     author: "MASTerm Security Team".to_string(),
                     license: "MIT".to_string(),
                     homepage: Some("https://masterm.dev/plugins/ip-reputation".to_string()),
@@ -69,13 +70,13 @@ impl IpReputationPlugin {
             for target in targets {
                 let cache_clone = cache.clone();
                 let target_clone = target.clone();
-                
+
                 // Use block_in_place for sync context
                 let result = handle.block_on(async {
                     let cache = cache_clone.read().await;
                     cache.check(&target_clone).await
                 });
-                
+
                 results.push((target, result));
             }
         }

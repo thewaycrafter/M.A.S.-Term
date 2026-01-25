@@ -155,8 +155,9 @@ impl SshGpgMonitorPlugin {
 
         // GPG operations
         if cmd_lower.contains("gpg") {
-            if cmd_lower.contains("--gen-key") || cmd_lower.contains("--generate-key") 
-                || cmd_lower.contains("--full-gen-key") 
+            if cmd_lower.contains("--gen-key")
+                || cmd_lower.contains("--generate-key")
+                || cmd_lower.contains("--full-gen-key")
             {
                 ops.push(KeyOpInfo {
                     operation: KeyOperation::Generate,
@@ -276,7 +277,9 @@ impl SshGpgMonitorPlugin {
             msg.push_str("Ensure you have backups before deleting keys.\n");
         }
 
-        msg.push_str("\nType '\x1b[1;32myes\x1b[0m' to proceed or '\x1b[1;31mno\x1b[0m' to cancel:");
+        msg.push_str(
+            "\nType '\x1b[1;32myes\x1b[0m' to proceed or '\x1b[1;31mno\x1b[0m' to cancel:",
+        );
 
         msg
     }
@@ -319,7 +322,11 @@ impl Plugin for SshGpgMonitorPlugin {
         let operations = self.detect_operations(cmd);
 
         // Filter to alertable operations
-        let alertable: Vec<_> = operations.iter().filter(|o| self.should_alert(o)).cloned().collect();
+        let alertable: Vec<_> = operations
+            .iter()
+            .filter(|o| self.should_alert(o))
+            .cloned()
+            .collect();
 
         if alertable.is_empty() {
             // Log if enabled
