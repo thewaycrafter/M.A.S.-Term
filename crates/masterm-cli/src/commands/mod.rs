@@ -11,10 +11,13 @@ pub mod mode;
 pub mod plugins;
 pub mod profile;
 pub mod prompt;
+pub mod security;
 pub mod setup;
 pub mod sync;
 pub mod update;
 pub mod welcome;
+pub mod check;
+
 
 /// Output formatting helpers
 pub mod output {

@@ -150,13 +150,76 @@ create_config() {
         return 0
     fi
 
-    info "Creating default configuration..."
-    cat > "$CONFIG_FILE" << 'EOF'
+    local ENABLED_PLUGINS=""
+    
+    # Default recommended plugins
+    local PLUGINS=(
+        "git:Git integration"
+        "env:Environment detection"
+        "prod-guard:Production safety details"
+        "node:Node.js context"
+        "python:Python context"
+        "rust:Rust context"
+        "go:Go context"
+        "docker:Docker context"
+        "kubernetes:Kubernetes context"
+    )
+
+    local SECURITY_PLUGINS=(
+        "secret-detection:Prevent secret leaks"
+        "audit-log:Command usage auditing"
+        "priv-escalation:Sudo usage alerts"
+        "suspicious-pattern:Malicious command detection"
+        "package-audit:Package installation safety"
+        "ssh-gpg-monitor:Key usage monitoring"
+    )
+
+    info "Configuration Setup"
+    echo "Do you want to customize enabled plugins? [y/N] (Default: All recommended)"
+    read -r customize
+    
+    if [[ "$customize" =~ ^([yY][eE][sS]|[yY])$ ]]; then
+        info "Context Plugins:"
+        for entry in "${PLUGINS[@]}"; do
+            KEY="${entry%%:*}"
+            DESC="${entry#*:}"
+            echo -n "  Enable $KEY ($DESC)? [Y/n] "
+            read -r ans
+            if [[ -z "$ans" || "$ans" =~ ^([yY][eE][sS]|[yY])$ ]]; then
+                ENABLED_PLUGINS="$ENABLED_PLUGINS\"$KEY\", "
+            fi
+        done
+
+        info "Security Plugins:"
+        for entry in "${SECURITY_PLUGINS[@]}"; do
+            KEY="${entry%%:*}"
+            DESC="${entry#*:}"
+            echo -n "  Enable $KEY ($DESC)? [Y/n] "
+            read -r ans
+            if [[ -z "$ans" || "$ans" =~ ^([yY][eE][sS]|[yY])$ ]]; then
+                ENABLED_PLUGINS="$ENABLED_PLUGINS\"$KEY\", "
+            fi
+        done
+        
+        # Remove trailing comma and space
+        ENABLED_PLUGINS="${ENABLED_PLUGINS%, }"
+    else
+        # Default: Enable all
+        ENABLED_PLUGINS="
+    # Context
+    \"git\", \"env\", \"prod-guard\", \"node\", \"python\", \"rust\", \"go\", \"docker\", \"kubernetes\",
+    # Security
+    \"secret-detection\", \"audit-log\", \"priv-escalation\", \"suspicious-pattern\", \"package-audit\", \"ssh-gpg-monitor\""
+    fi
+
+    info "Creating configuration..."
+    cat > "$CONFIG_FILE" << EOF
 # MASTerm Configuration
 # https://github.com/singhalmridul/MASTerm
 
 [core]
 mode = "dev"
+log_level = "warn"
 
 [prompt]
 format = "powerline"
@@ -169,6 +232,9 @@ mode = "auto"
 
 [prompt.colors]
 theme = "catppuccin"
+
+[plugins]
+enabled = [$ENABLED_PLUGINS]
 
 [safety]
 prod_detection = true

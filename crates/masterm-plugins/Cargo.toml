@@ -8,8 +8,14 @@ description = "Built-in plugins for MASTerm terminal framework"
 
 [dependencies]
 masterm-core = { path = "../masterm-core" }
+masterm-security = { path = "../masterm-security" }
 async-trait.workspace = true
 tokio.workspace = true
 serde.workspace = true
+serde_json.workspace = true
 toml.workspace = true
 regex.workspace = true
+chrono.workspace = true
+tracing.workspace = true
+dirs.workspace = true
+
