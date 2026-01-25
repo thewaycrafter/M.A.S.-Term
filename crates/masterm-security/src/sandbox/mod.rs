@@ -24,7 +24,7 @@ impl Sandbox {
         // Platform specific sandbox
         #[cfg(target_os = "macos")]
         {
-             Self::macos_sandbox(level, cmd, args)
+            Self::macos_sandbox(level, cmd, args)
         }
 
         #[cfg(target_os = "linux")]
