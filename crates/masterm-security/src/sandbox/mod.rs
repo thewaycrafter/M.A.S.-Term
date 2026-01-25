@@ -20,11 +20,11 @@ pub struct Sandbox;
 
 impl Sandbox {
     /// create a sandboxed command based on OS availability
-    pub fn create_command(level: SandboxLevel, cmd: &str, args: &[String]) -> Command {
+    pub fn create_command(_level: SandboxLevel, cmd: &str, args: &[String]) -> Command {
         // Platform specific sandbox
         #[cfg(target_os = "macos")]
         {
-            Self::macos_sandbox(level, cmd, args)
+            Self::macos_sandbox(_level, cmd, args)
         }
 
         #[cfg(target_os = "linux")]

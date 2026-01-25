@@ -193,7 +193,6 @@ impl AuditStorage {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::audit::AuditEventBuilder;
 
     #[tokio::test]
     async fn test_storage_append_and_read() {
