@@ -1,0 +1,15 @@
+[deploy]
+description = "Simulate a deployment process"
+steps = [
+    "echo Building project...",
+    "sleep 1",
+    "echo Running tests...",
+    "sleep 1",
+    "echo Deploying to production...",
+    "sleep 1",
+    "echo Done!"
+]
+
+[test]
+description = "Run test suite"
+steps = ["ls -la", "echo Tests passed"]

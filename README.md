@@ -112,11 +112,11 @@ Your prompt shows everything at a glance:
 - ⏱️ Command duration
 - ⚠️ Production warnings
 
-### 🖥️ Feature-Rich TUI Dashboard
-Running `masterm dashboard` opens a powerful terminal interface:
-- **System Monitor**: Real-time CPU & Memory usage graphs.
-- **Config Editor**: View and inspect your configuration.
-- **Plugin Manager**: Manage built-in and WASM plugins.
+### 🖥️ High-Fidelity TUI Dashboard
+Running `masterm dashboard` opens a premium terminal interface:
+- **System Monitor**: Real-time charts for CPU, Memory, and Network I/O.
+- **Cyberpunk Theme**: Beautiful charts with history tracking.
+- **Config & Plugins**: Manage your setup visually.
 
 ### ☁️ Cloud Sync
 Sync your configuration across machines using GitHub Gists:
@@ -139,6 +139,24 @@ MASTerm automatically detects and displays context:
 | **Docker** | Container context |
 | **Kubernetes** | Current context |
 | **Environment** | Dev / Staging / Production |
+
+### 🤖 AI Command Assistance
+
+Stop memorizing complex flags. Just ask:
+```bash
+masterm ask "undo last commit"
+masterm ask "find text in files"
+masterm ask "kill process on port 3000"
+```
+MASTerm converts natural language into shell commands with a smart risk assessment engine.
+
+### ⚡ Workflow Automation
+
+Define complex team tasks in `workflows.toml` and run them with one command:
+```bash
+masterm run deploy
+```
+Automate builds, tests, and deployments with a declarative task runner.
 
 ### 🛡️ Production Safety Guards
 

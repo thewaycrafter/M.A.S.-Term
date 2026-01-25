@@ -18,6 +18,8 @@
    - [Context Awareness](#context-awareness)
    - [Production Safety Guards](#production-safety-guards)
    - [TUI Dashboard](#tui-dashboard)
+   - [AI Command Assistance](#ai-command-assistance)
+   - [Workflow Automation](#workflow-automation)
    - [Cloud Sync](#cloud-sync)
 6. [Plugin System](#plugin-system)
    - [Marketplace](#marketplace)
@@ -89,6 +91,26 @@ dangerous_commands = ["rm -rf", "DROP DATABASE"]
 Run `masterm dashboard` to see a full-screen terminal UI monitor.
 - **Tab 1**: System Monitor (REAL-TIME graphs)
 - **Tab 2**: Configuration Viewer
+
+### AI Command Assistance
+Convert natural language to shell commands:
+```bash
+masterm ask "how to check disk space"
+```
+It provides a safe, explained command with a risk rating.
+
+### Workflow Automation
+Create a `workflows.toml` file in your project:
+```toml
+[deploy]
+description = "Build and ship"
+steps = ["cargo test", "./deploy.sh"]
+```
+
+Run it:
+```bash
+masterm run deploy
+```
 
 ## 6. Plugin System
 ### Marketplace

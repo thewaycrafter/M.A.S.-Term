@@ -40,6 +40,12 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
+    /// Ask AI for help
+    Ask(commands::ask::AskArgs),
+
+    /// Run a workflow
+    Run(commands::run::RunArgs),
+
     /// Install MASTerm for your shell
     Install(commands::install::InstallArgs),
 
@@ -133,6 +139,8 @@ async fn main() -> anyhow::Result<()> {
 
     // Execute command
     match cli.command {
+        Commands::Ask(args) => commands::ask::run(args).await,
+        Commands::Run(args) => commands::run::run(args).await,
         Commands::Install(args) => commands::install::run(args).await,
         Commands::Uninstall(args) => commands::install::uninstall(args).await,
         Commands::Update(args) => commands::update::run(args).await,

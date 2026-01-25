@@ -1,5 +1,7 @@
 //! CLI command modules
 
+pub mod ask;
+pub mod run;
 pub mod cache;
 pub mod check;
 pub mod completions;

@@ -7,14 +7,25 @@ pub enum Tab {
     Plugins,
 }
 
-use sysinfo::{CpuRefreshKind, MemoryRefreshKind, RefreshKind, System};
+use sysinfo::{CpuRefreshKind, MemoryRefreshKind, Networks, RefreshKind, System};
 
 pub struct App {
     pub tab: Tab,
     pub title: String,
     pub system: System,
+    pub networks: Networks,
     pub config_items: Vec<(String, String)>,
     pub plugin_items: Vec<(String, String, String)>,
+    // History for charts
+    pub cpu_history: Vec<(f64, f64)>,
+    pub mem_history: Vec<(f64, f64)>,
+    pub rx_history: Vec<(f64, f64)>,
+    pub tx_history: Vec<(f64, f64)>,
+    pub tick_count: f64,
+    // Static info
+    pub os_info: String,
+    pub host_name: String,
+    pub kernel_ver: String,
 }
 
 impl App {
@@ -25,22 +36,67 @@ impl App {
                 .with_memory(MemoryRefreshKind::everything()),
         );
         system.refresh_all();
+        let networks = Networks::new_with_refreshed_list();
 
         let config_items = Self::load_config();
         let plugin_items = Self::load_plugins();
+        
+        // Static info
+        let os_info = System::long_os_version().unwrap_or_else(|| "Unknown".to_string());
+        let host_name = System::host_name().unwrap_or_else(|| "localhost".to_string());
+        let kernel_ver = System::kernel_version().unwrap_or_else(|| "Unknown".to_string());
+
 
         Self {
             tab: Tab::Dashboard,
             title: "MASTerm Dashboard".to_string(),
             system,
+            networks,
             config_items,
             plugin_items,
+            cpu_history: Vec::new(),
+            mem_history: Vec::new(),
+            rx_history: Vec::new(),
+            tx_history: Vec::new(),
+            tick_count: 0.0,
+            os_info,
+            host_name,
+            kernel_ver,
         }
     }
 
     pub fn on_tick(&mut self) {
         self.system.refresh_cpu();
         self.system.refresh_memory();
+        self.networks.refresh();
+
+        self.tick_count += 1.0;
+
+        // Update CPU History
+        let global_cpu = self.system.global_cpu_info().cpu_usage() as f64;
+        self.cpu_history.push((self.tick_count, global_cpu));
+
+        // Update Memory History
+        let used_mem = self.system.used_memory() as f64;
+        let total_mem = self.system.total_memory() as f64;
+        let mem_percent = (used_mem / total_mem) * 100.0;
+        self.mem_history.push((self.tick_count, mem_percent));
+
+        // Update Network History (sum of all interfaces)
+        let (rx, tx) = self.networks.iter().fold((0, 0), |acc, (_, data)| {
+            (acc.0 + data.received(), acc.1 + data.transmitted())
+        });
+        // Convert to KB
+        self.rx_history.push((self.tick_count, rx as f64 / 1024.0));
+        self.tx_history.push((self.tick_count, tx as f64 / 1024.0));
+
+        // Keep last 100 points
+        if self.cpu_history.len() > 100 {
+            self.cpu_history.remove(0);
+            self.mem_history.remove(0);
+            self.rx_history.remove(0);
+            self.tx_history.remove(0);
+        }
     }
 
     fn load_config() -> Vec<(String, String)> {
