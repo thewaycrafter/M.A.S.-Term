@@ -62,27 +62,28 @@ fn draw_header(f: &mut Frame, app: &App, area: Rect) {
                 1 => Color::Magenta,
                 _ => Color::Blue,
             };
-            Line::from(Span::styled(*s, Style::default().fg(color).add_modifier(Modifier::BOLD)))
+            Line::from(Span::styled(
+                *s,
+                Style::default().fg(color).add_modifier(Modifier::BOLD),
+            ))
         })
         .collect();
-    
+
     let logo = Paragraph::new(logo_lines).block(Block::default());
     f.render_widget(logo, chunks[0]);
 
     // Tabs in right chunk
-    let titles: Vec<Line> = vec![
-        "󰆼 Dashboard (1)",
-        " Config (2)",
-        " Plugins (3)",
-    ]
-    .into_iter()
-    .map(|t| {
-        Line::from(Span::styled(
-            t,
-            Style::default().fg(Color::White).add_modifier(Modifier::BOLD),
-        ))
-    })
-    .collect();
+    let titles: Vec<Line> = vec!["󰆼 Dashboard (1)", " Config (2)", " Plugins (3)"]
+        .into_iter()
+        .map(|t| {
+            Line::from(Span::styled(
+                t,
+                Style::default()
+                    .fg(Color::White)
+                    .add_modifier(Modifier::BOLD),
+            ))
+        })
+        .collect();
 
     let tabs = Tabs::new(titles)
         .block(card_block("Menu"))
@@ -121,10 +122,24 @@ fn draw_dashboard(f: &mut Frame, app: &App, area: Rect) {
         .split(rows[1]);
 
     // Top Left: CPU
-    draw_line_chart(f, app, top_row[0], "CPU Usage %", &app.cpu_history, Color::Cyan);
-    
+    draw_line_chart(
+        f,
+        app,
+        top_row[0],
+        "CPU Usage %",
+        &app.cpu_history,
+        Color::Cyan,
+    );
+
     // Top Right: Memory
-    draw_line_chart(f, app, top_row[1], "Memory Usage %", &app.mem_history, Color::Magenta);
+    draw_line_chart(
+        f,
+        app,
+        top_row[1],
+        "Memory Usage %",
+        &app.mem_history,
+        Color::Magenta,
+    );
 
     // Bottom Left: Network I/O
     draw_network_chart(f, app, bottom_row[0]);
@@ -180,8 +195,11 @@ fn draw_network_chart(f: &mut Frame, app: &App, area: Rect) {
 
 fn draw_system_info(f: &mut Frame, app: &App, area: Rect) {
     let cpu_count = format!("{}", app.system.cpus().len());
-    let memory_total = format!("{:.1} GB", app.system.total_memory() as f64 / 1024.0 / 1024.0 / 1024.0);
-    
+    let memory_total = format!(
+        "{:.1} GB",
+        app.system.total_memory() as f64 / 1024.0 / 1024.0 / 1024.0
+    );
+
     let rows = vec![
         Row::new(vec!["OS System", &app.os_info]),
         Row::new(vec!["Kernel", &app.kernel_ver]),
@@ -197,7 +215,11 @@ fn draw_system_info(f: &mut Frame, app: &App, area: Rect) {
     .block(card_block("System Information"))
     .header(
         Row::new(vec!["Property", "Value"])
-            .style(Style::default().fg(Color::Blue).add_modifier(Modifier::BOLD))
+            .style(
+                Style::default()
+                    .fg(Color::Blue)
+                    .add_modifier(Modifier::BOLD),
+            )
             .bottom_margin(1),
     )
     .column_spacing(2);
@@ -214,7 +236,9 @@ fn card_block(title: &str) -> Block<'_> {
         .border_type(ratatui::widgets::BorderType::Rounded)
         .title(Span::styled(
             format!(" {} ", title),
-            Style::default().fg(Color::Cyan).add_modifier(Modifier::BOLD),
+            Style::default()
+                .fg(Color::Cyan)
+                .add_modifier(Modifier::BOLD),
         ))
         .title_alignment(ratatui::layout::Alignment::Center)
 }
@@ -278,7 +302,11 @@ fn draw_config(f: &mut Frame, app: &App, area: Rect) {
     let table = Table::new(rows, widths)
         .header(
             Row::new(vec!["Key", "Value"])
-                .style(Style::default().fg(Color::Cyan).add_modifier(Modifier::BOLD))
+                .style(
+                    Style::default()
+                        .fg(Color::Cyan)
+                        .add_modifier(Modifier::BOLD),
+                )
                 .bottom_margin(1),
         )
         .block(card_block("Configuration"))
@@ -291,9 +319,7 @@ fn draw_plugins(f: &mut Frame, app: &App, area: Rect) {
     let rows: Vec<Row> = app
         .plugin_items
         .iter()
-        .map(|(name, ver, desc)| {
-            Row::new(vec![name.clone(), ver.clone(), desc.clone()])
-        })
+        .map(|(name, ver, desc)| Row::new(vec![name.clone(), ver.clone(), desc.clone()]))
         .collect();
 
     let widths = [
@@ -305,7 +331,11 @@ fn draw_plugins(f: &mut Frame, app: &App, area: Rect) {
     let table = Table::new(rows, widths)
         .header(
             Row::new(vec!["Name", "Version", "Description"])
-                .style(Style::default().fg(Color::Magenta).add_modifier(Modifier::BOLD))
+                .style(
+                    Style::default()
+                        .fg(Color::Magenta)
+                        .add_modifier(Modifier::BOLD),
+                )
                 .bottom_margin(1),
         )
         .block(card_block("Installed Plugins"))
@@ -317,9 +347,17 @@ fn draw_plugins(f: &mut Frame, app: &App, area: Rect) {
 fn draw_footer(f: &mut Frame, _app: &App, area: Rect) {
     let p = Paragraph::new(Line::from(vec![
         Span::raw("Press "),
-        Span::styled("q", Style::default().add_modifier(Modifier::BOLD).fg(Color::Red)),
+        Span::styled(
+            "q",
+            Style::default().add_modifier(Modifier::BOLD).fg(Color::Red),
+        ),
         Span::raw(" to quit | "),
-        Span::styled("1-3", Style::default().add_modifier(Modifier::BOLD).fg(Color::Yellow)),
+        Span::styled(
+            "1-3",
+            Style::default()
+                .add_modifier(Modifier::BOLD)
+                .fg(Color::Yellow),
+        ),
         Span::raw(" to switch tabs | MASTerm v1.0.0"),
     ]))
     .style(Style::default().fg(Color::Gray))

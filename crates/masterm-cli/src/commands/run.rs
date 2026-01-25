@@ -37,8 +37,8 @@ pub async fn run(args: RunArgs) -> Result<()> {
 
     // 2. Parse config
     let content = std::fs::read_to_string(config_path)?;
-    let config: WorkflowConfig = toml::from_str(&content)
-        .map_err(|e| anyhow!("Failed to parse workflows.toml: {}", e))?;
+    let config: WorkflowConfig =
+        toml::from_str(&content).map_err(|e| anyhow!("Failed to parse workflows.toml: {}", e))?;
 
     // 3. Find workflow
     let workflow = config
@@ -47,11 +47,7 @@ pub async fn run(args: RunArgs) -> Result<()> {
         .ok_or_else(|| anyhow!("Workflow '{}' not found in workflows.toml", args.name))?;
 
     // 4. Execute
-    println!(
-        "\n{} Running workflow: {}\n",
-        "🚀".cyan(),
-        args.name.bold()
-    );
+    println!("\n{} Running workflow: {}\n", "🚀".cyan(), args.name.bold());
 
     if let Some(desc) = &workflow.description {
         println!("   {}\n", desc.dimmed());

@@ -40,12 +40,11 @@ impl App {
 
         let config_items = Self::load_config();
         let plugin_items = Self::load_plugins();
-        
+
         // Static info
         let os_info = System::long_os_version().unwrap_or_else(|| "Unknown".to_string());
         let host_name = System::host_name().unwrap_or_else(|| "localhost".to_string());
         let kernel_ver = System::kernel_version().unwrap_or_else(|| "Unknown".to_string());
-
 
         Self {
             tab: Tab::Dashboard,

@@ -1,7 +1,6 @@
 //! CLI command modules
 
 pub mod ask;
-pub mod run;
 pub mod cache;
 pub mod check;
 pub mod completions;
@@ -14,6 +13,7 @@ pub mod mode;
 pub mod plugins;
 pub mod profile;
 pub mod prompt;
+pub mod run;
 pub mod security;
 pub mod setup;
 pub mod sync;
