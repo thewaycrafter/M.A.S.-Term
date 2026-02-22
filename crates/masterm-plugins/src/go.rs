@@ -21,7 +21,7 @@ impl GoPlugin {
                     name: "go".to_string(),
                     version: "1.0.0".to_string(),
                     description: "Go version detection".to_string(),
-                    author: "MASTerm Team".to_string(),
+                    author: "theWayCrafter".to_string(),
                     license: "MIT".to_string(),
                     homepage: None,
                 },

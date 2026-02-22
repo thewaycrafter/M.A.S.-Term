@@ -3,7 +3,7 @@
 # MASTerm Uninstallation Script
 #
 # Usage:
-#   curl -fsSL https://raw.githubusercontent.com/singhalmridul/MASTerm/main/uninstall.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/theWayCrafter/MASTerm/main/uninstall.sh | bash
 #
 
 set -e

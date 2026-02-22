@@ -36,12 +36,12 @@ MASTerm is a next-generation terminal framework written in Rust. It replaces you
 ## 2. Installation
 ### One-Line Install
 ```bash
-curl -fsSL https://raw.githubusercontent.com/singhalmridul/MASTerm/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/theWayCrafter/MASTerm/main/install.sh | bash
 ```
 
 ### Manual Build
 ```bash
-git clone https://github.com/singhalmridul/MASTerm.git
+git clone https://github.com/theWayCrafter/MASTerm.git
 cd MASTerm
 cargo install --path crates/masterm-cli
 masterm install

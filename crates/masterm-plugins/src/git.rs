@@ -24,7 +24,7 @@ impl GitPlugin {
                     name: "git".to_string(),
                     version: "1.0.0".to_string(),
                     description: "Git repository context and status".to_string(),
-                    author: "MASTerm Team".to_string(),
+                    author: "theWayCrafter".to_string(),
                     license: "MIT".to_string(),
                     homepage: Some("https://masterm.dev/plugins/git".to_string()),
                 },

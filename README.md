@@ -28,7 +28,7 @@
   <img src="https://img.shields.io/badge/License-MIT-green" alt="License">
   <img src="https://img.shields.io/badge/Platform-macOS%20%7C%20Linux%20%7C%20Windows-blue" alt="Platform">
   <img src="https://img.shields.io/badge/Shells-Zsh%20%7C%20Bash%20%7C%20Fish%20%7C%20PowerShell-cyan" alt="Shells">
-  <img src="https://img.shields.io/github/stars/singhalmridul/MASTerm?style=social" alt="Stars">
+  <img src="https://img.shields.io/github/stars/theWayCrafter/MASTerm?style=social" alt="Stars">
 </p>
 
 <p align="center">
@@ -45,7 +45,7 @@ Run the interactive installer to set up MASTerm and choose your features:
 
 ```bash
 # One-command install (macOS/Linux)
-curl -fsSL https://raw.githubusercontent.com/singhalmridul/MASTerm/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/theWayCrafter/MASTerm/main/install.sh | bash
 
 # Configure your experience (Recommended)
 masterm setup
@@ -218,13 +218,13 @@ One command installs everything:
 
 ```bash
 # Using curl (macOS/Linux)
-curl -fsSL https://raw.githubusercontent.com/singhalmridul/MASTerm/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/theWayCrafter/MASTerm/main/install.sh | bash
 
 # Using wget
-wget -qO- https://raw.githubusercontent.com/singhalmridul/MASTerm/main/install.sh | bash
+wget -qO- https://raw.githubusercontent.com/theWayCrafter/MASTerm/main/install.sh | bash
 
 # Specify shell explicitly
-curl -fsSL https://raw.githubusercontent.com/singhalmridul/MASTerm/main/install.sh | bash -s -- --shell zsh
+curl -fsSL https://raw.githubusercontent.com/theWayCrafter/MASTerm/main/install.sh | bash -s -- --shell zsh
 ```
 
 **What it does:**
@@ -237,7 +237,7 @@ curl -fsSL https://raw.githubusercontent.com/singhalmridul/MASTerm/main/install.
 
 ```bash
 # Clone
-git clone https://github.com/singhalmridul/MASTerm.git
+git clone https://github.com/theWayCrafter/MASTerm.git
 cd MASTerm
 
 # Build & Install
@@ -588,7 +588,7 @@ masterm/
 We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ```bash
-git clone https://github.com/singhalmridul/MASTerm.git
+git clone https://github.com/theWayCrafter/MASTerm.git
 cd MASTerm
 cargo build
 cargo test
@@ -606,9 +606,9 @@ MIT License — see [LICENSE](LICENSE) for details.
 <p align="center">
   <strong>MASTerm</strong> — Master your Terminal ⚡
   <br><br>
-  <a href="https://github.com/singhalmridul/MASTerm">GitHub</a> •
-  <a href="https://github.com/singhalmridul/MASTerm/issues">Issues</a> •
-  <a href="https://github.com/singhalmridul/MASTerm/discussions">Discussions</a>
+  <a href="https://github.com/theWayCrafter/MASTerm">GitHub</a> •
+  <a href="https://github.com/theWayCrafter/MASTerm/issues">Issues</a> •
+  <a href="https://github.com/theWayCrafter/MASTerm/discussions">Discussions</a>
   <br><br>
-  Made with ❤️ by <a href="https://github.com/singhalmridul">Mridul Singhal</a>
+  Made with ❤️ by <a href="https://github.com/theWayCrafter">theWayCrafter</a>
 </p>

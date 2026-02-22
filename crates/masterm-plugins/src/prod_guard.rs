@@ -24,7 +24,7 @@ impl ProdGuardPlugin {
                     name: "prod-guard".to_string(),
                     version: "1.0.0".to_string(),
                     description: "Safety guards for production environments".to_string(),
-                    author: "MASTerm Team".to_string(),
+                    author: "theWayCrafter".to_string(),
                     license: "MIT".to_string(),
                     homepage: Some("https://masterm.dev/plugins/prod-guard".to_string()),
                 },

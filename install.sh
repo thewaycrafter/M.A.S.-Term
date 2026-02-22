@@ -1,13 +1,13 @@
 #!/bin/bash
 #
 # MASTerm Installation Script
-# https://github.com/singhalmridul/MASTerm
+# https://github.com/theWayCrafter/MASTerm
 #
 # Usage:
-#   curl -fsSL https://raw.githubusercontent.com/singhalmridul/MASTerm/main/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/theWayCrafter/MASTerm/main/install.sh | bash
 #
 # Or with options:
-#   curl -fsSL https://raw.githubusercontent.com/singhalmridul/MASTerm/main/install.sh | bash -s -- --shell zsh
+#   curl -fsSL https://raw.githubusercontent.com/theWayCrafter/MASTerm/main/install.sh | bash -s -- --shell zsh
 #
 
 set -e
@@ -23,7 +23,7 @@ NC='\033[0m' # No Color
 BOLD='\033[1m'
 
 # Configuration
-REPO="singhalmridul/MASTerm"
+REPO="theWayCrafter/MASTerm"
 INSTALL_DIR="$HOME/.masterm"
 CONFIG_FILE="$HOME/.masterm.toml"
 CARGO_BIN="$HOME/.cargo/bin"
@@ -215,7 +215,7 @@ create_config() {
     info "Creating configuration..."
     cat > "$CONFIG_FILE" << EOF
 # MASTerm Configuration
-# https://github.com/singhalmridul/MASTerm
+# https://github.com/theWayCrafter/MASTerm
 
 [core]
 mode = "dev"

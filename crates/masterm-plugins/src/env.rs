@@ -22,7 +22,7 @@ impl EnvPlugin {
                     name: "env".to_string(),
                     version: "1.0.0".to_string(),
                     description: "Environment type detection (dev/staging/prod)".to_string(),
-                    author: "MASTerm Team".to_string(),
+                    author: "theWayCrafter".to_string(),
                     license: "MIT".to_string(),
                     homepage: Some("https://masterm.dev/plugins/env".to_string()),
                 },
